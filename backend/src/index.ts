@@ -1,6 +1,8 @@
-import express from 'express';
+import express, { Application} from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import articleRouter from './routes/articles';
+import { db } from './config/db';
 
 dotenv.config();
 const app = express();
@@ -13,11 +15,13 @@ app.get('/', (req, res) => {
 	res.send('Backend is running!');
 });
 
-app.listen(PORT, () => {
-	console.log(`Server running on http://localhost:${PORT}`);
-});
 
-import { db } from './config/db';
+const createRoutes = (app:Application): void => {
+	app.use('/articles', articleRouter );
+	
+}
+
+createRoutes(app);
 
 app.get('/db-check', async (req, res) => {
 	try {
@@ -25,7 +29,12 @@ app.get('/db-check', async (req, res) => {
 		res.json({ success: true, message: 'DB connection OK', rows });
 	} catch (error) {
 		res
-			.status(500)
-			.json({ success: false, message: 'DB connection failed' + error });
+		.status(500)
+		.json({ success: false, message: 'DB connection failed' + error });
 	}
+});
+
+
+app.listen(PORT, () => {
+	console.log(`Server running on http://localhost:${PORT}`);
 });
