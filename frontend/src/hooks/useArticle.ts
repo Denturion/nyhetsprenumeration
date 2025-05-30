@@ -1,6 +1,11 @@
 import { useEffect, useReducer, useState } from "react";
 import { ArticleReducer, IArticle } from "../reducers/articlereducer";
-import { createArticle, getAllArticles } from "../services/articleservice";
+import {
+  createArticle,
+  deleteArticleById,
+  getAllArticles,
+  updateArticleById,
+} from "../services/articleservice";
 import type { ArticleData, FormType } from "../models/ArticleOutput";
 
 export const useArticle = () => {
@@ -46,5 +51,29 @@ export const useArticle = () => {
     });
   };
 
-  return { articles, isloading, Dispatch, createNewArticle };
+  const UpdateArticle = async (UpdateId:number,formData:FormType) => {
+    const {article} = await updateArticleById(UpdateId,formData);
+    Dispatch ({
+        type:IArticle.UPDATE_ARTICLE,
+        payload:article
+    })
+  };
+
+
+  const DeleteArticle = async (id: number) => {
+    await deleteArticleById(id);
+    Dispatch({
+      type: IArticle.REMOVE_ARTICLE,
+      payload: { id: id } as ArticleData,
+    });
+  };
+
+  return {
+    articles,
+    isloading,
+    Dispatch,
+    createNewArticle,
+    UpdateArticle,
+    DeleteArticle,
+  };
 };

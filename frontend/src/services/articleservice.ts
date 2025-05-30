@@ -1,4 +1,4 @@
-import type { ArticleData, CreateArticleMesage, UpdateArticleMessage } from "../models/ArticleOutput";
+import type { ArticleData, CreateArticleMesage, FormType, UpdateArticleMessage } from "../models/ArticleOutput";
 import { deleteData, getData, patchData, postData } from "./baseservice";
 
 const BASE_URL = "http://localhost:5000";
@@ -21,7 +21,7 @@ export const getArticleById = async (id:number):Promise<ArticleData> => {
     return handleRequest(getData(`${BASE_URL}/articles/${id}`));
 }
 
-export const updateArticleById = async (id:number,payload:ArticleData):Promise<UpdateArticleMessage> => {
+export const updateArticleById = async (id:number,payload:FormType):Promise<UpdateArticleMessage> => {
     return handleRequest(patchData(`${BASE_URL}/articles/${id}`,payload));
 }
 

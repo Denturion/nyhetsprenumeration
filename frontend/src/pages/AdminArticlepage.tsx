@@ -1,14 +1,27 @@
-import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useArticle } from "../hooks/useArticle";
-import type { FormType } from "../models/ArticleOutput";
+import type { ArticleData, FormType } from "../models/ArticleOutput";
+import { ArticleList } from "../components/Articlelist";
 
 export const AdminArticlepage = () => {
-  const { articles, isloading, createNewArticle } = useArticle();
+  const { articles, isloading, createNewArticle, UpdateArticle, DeleteArticle } = useArticle();
+  const [openUpdate, setOpenupdate] = useState<boolean>(false);
+  const [UpdateId, setUpdateId] = useState<number>(0);
   const [formData, setFormData] = useState<FormType>({
     title: "",
     content: "",
     levelRequired: "basic",
   });
+
+  const handelUpdate = (article:ArticleData) => {   
+    setFormData({
+        title: article.title,
+        content: article.content,
+        levelRequired:article.levelRequired
+    })
+    setUpdateId(article.id)
+    setOpenupdate(true)
+  }
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -17,13 +30,20 @@ export const AdminArticlepage = () => {
     setFormData(Article => ({ ...Article, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
+        if (openUpdate) {
+        UpdateArticle(UpdateId,formData)
+        }else {
         createNewArticle(formData)
-        setFormData({ title: "", content: "", levelRequired: "basic" });
+        
+        }
     } catch (error) {
       console.error("Kunde inte skapa artikel:", error);
+    } finally {
+        setFormData({ title: "", content: "", levelRequired: "basic" });
+        setOpenupdate(false)
     }
   };
 
@@ -72,21 +92,15 @@ export const AdminArticlepage = () => {
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          Skapa artikel
+         {!openUpdate ? "Skapa artikel" : "updatera"}
         </button>
       </form>
 
       {isloading ? (
         <p>Laddar artiklar...</p>
-      ) : (
-        <ul className="space-y-2">
-          {articles.map(article => (
-            <li key={article.id} className="border-b py-2">
-              <strong>{article.title}</strong> – nivå: {article.levelRequired}
-            </li>
-          ))}
-        </ul>
-      )}
+      ) : 
+        <ArticleList articles={articles} onUpdate={handelUpdate} onDelete={DeleteArticle}/>
+      }
     </div>
   );
 };
