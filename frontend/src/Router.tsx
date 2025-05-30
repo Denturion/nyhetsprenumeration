@@ -4,6 +4,7 @@ import { HomePage } from './pages/HomePage';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SingleArticlePage } from './pages/SingleArticlePage';
+import { AdminArticlepage } from './pages/AdminArticlepage';
 
 export const router = createBrowserRouter([
 	{
@@ -26,6 +27,17 @@ export const router = createBrowserRouter([
 				path: '/article/:id',
 				element: <SingleArticlePage />,
 			},
+		],
+	},
+	{
+		path: '/admin',
+		element: <App />,
+		children: [
+			{
+				path: 'article',
+				element: <AdminArticlepage />,
+			}
+			
 		],
 	},
 ]);

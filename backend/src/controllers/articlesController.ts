@@ -6,6 +6,7 @@ import { ArticleParamas } from '../models/ArticleParams';
 import { ResultSetHeader } from 'mysql2';
 
 
+
 export const getArticles = async (req: Request, res: Response): Promise<void> => {
 let sql = "SELECT * FROM Huggtid.Article"
 try {
@@ -44,10 +45,18 @@ let sql = `INSERT INTO Huggtid.Article
             (title, content, levelRequired)
              VALUES ( ?, ?, ?)`;
 try {
-    const [result] = await db.query<ResultSetHeader>(sql,[ title,content, levelRequired])   
+    const [result] = await db.query<ResultSetHeader>(sql,[ title,content, levelRequired])
+    
+    sql = "SELECT * FROM Huggtid.Article WHERE id = ?"
+    const [rows] = await db.query(sql, result.insertId)
+    const articles = rows as ArticleInput[];
+    const article = articles[0];
+  
+    
     res.status(201).json({
   message: 'Article created',
-  id: result.insertId
+  id: result.insertId,
+  created: article.createdAt
 });
 } catch (error) {
     res.status(500).json({ message: 'Article not created, Needed fields: title,content,levelRequired enum:[ basic,plus,full ]' });

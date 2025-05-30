@@ -6,9 +6,12 @@ export interface ArticleData {
   createdAt: string;
 }
 
+export type FormType = Pick<ArticleData, "title" | "content" | "levelRequired">;
+
 export interface CreateArticleMesage {
   message: string;
   id: number;
+  created:string;
 }
 
 export interface UpdateArticleMessage {
