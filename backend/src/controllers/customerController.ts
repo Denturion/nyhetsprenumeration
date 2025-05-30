@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 // User registration
 
 export const userRegister = async (req: Request, res: Response) => {
-	const { email, password } = req.body;
+	const { email, password, subscriptionLevel } = req.body;
 	if (!email || !password) {
 		return res.status(400).json({ message: 'Email and password required' });
 	}
@@ -22,6 +22,7 @@ export const userRegister = async (req: Request, res: Response) => {
 		await db.query('INSERT INTO User (email, password_hash) VALUES (?, ?)', [
 			email,
 			password_hash,
+			subscriptionLevel || 'basic',
 		]);
 		res.status(201).json({ message: 'User registered' });
 	} catch (error) {
@@ -59,7 +60,7 @@ export const userLogin = async (req: Request, res: Response) => {
 				subscriptionLevel: user.subscriptionLevel,
 			},
 			process.env.JWT_SECRET || 'secret',
-			{ expiresIn: 'id' }
+			{ expiresIn: '1d' }
 		);
 		res.json({ token });
 	} catch (error) {
