@@ -27,10 +27,12 @@ app.get('/db-check', async (req, res) => {
 	try {
 		const [rows] = await db.query('SELECT 1');
 		res.json({ success: true, message: 'DB connection OK', rows });
+		console.log('DB connection successful:', rows);
 	} catch (error) {
 		res
-		.status(500)
-		.json({ success: false, message: 'DB connection failed' + error });
+			.status(500)
+			.json({ success: false, message: 'DB connection failed' + error });
+		console.log('DB connection failed:', error);
 	}
 });
 
