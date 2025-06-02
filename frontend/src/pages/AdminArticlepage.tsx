@@ -9,6 +9,7 @@ export const AdminArticlepage = () => {
   const [openUpdate, setOpenupdate] = useState<boolean>(false);
   const [UpdateId, setUpdateId] = useState<number>(0);
   const [pagenumber,setPagenumber] = useState<number>(1)
+  const [selectedLevel, setSelectedLevel] = useState<string>("");
  
   const [formData, setFormData] = useState<FormType>({
     title: "",
@@ -18,6 +19,7 @@ export const AdminArticlepage = () => {
 
 const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   const newLevel = e.target.value;
+  setSelectedLevel(newLevel)
   getallArticles(1,newLevel);
 };
 
@@ -27,7 +29,7 @@ const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   }
   setPagenumber(prev => {
     const nextPage = direction === 'next' ? prev + 1 : Math.max(1, prev - 1);
-    getallArticles(nextPage);
+    getallArticles(nextPage,selectedLevel);
     return nextPage;
   });
  };
