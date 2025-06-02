@@ -1,3 +1,11 @@
+
+export interface Articlepagination {
+  page: number;
+  totalPages: number;
+  totalItems: number;
+  items: ArticleData[];
+}
+
 export interface ArticleData {
   id: number;
   title: string;

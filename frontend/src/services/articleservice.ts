@@ -1,4 +1,4 @@
-import type { ArticleData, CreateArticleMesage, FormType, UpdateArticleMessage } from "../models/ArticleOutput";
+import type { ArticleData, Articlepagination, CreateArticleMesage, FormType, UpdateArticleMessage } from "../models/ArticleOutput";
 import { deleteData, getData, patchData, postData } from "./baseservice";
 
 const BASE_URL = "http://localhost:5000";
@@ -13,8 +13,8 @@ const handleRequest = async <T>(request: Promise<T>): Promise<T> => {
 };
 
 
-export const getAllArticles = async ():Promise<ArticleData[]> => {
-    return handleRequest(getData(`${BASE_URL}/articles`));
+export const getAllArticles = async (page:number,query?:string):Promise<Articlepagination> => {
+    return handleRequest(getData(`${BASE_URL}/articles?page=${page}&limit=8${query}`));
 }
 
 export const getArticleById = async (id:number):Promise<ArticleData> => {

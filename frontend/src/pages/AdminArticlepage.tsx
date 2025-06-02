@@ -1,17 +1,38 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useArticle } from "../hooks/useArticle";
 import type { ArticleData, FormType } from "../models/ArticleOutput";
-import { ArticleList } from "../components/Articlelist";
+import { ArticleList } from "../components/ArticleList";
+
 
 export const AdminArticlepage = () => {
-  const { articles, isloading, createNewArticle, UpdateArticle, DeleteArticle } = useArticle();
+  const { articles, isloading,totalPages, createNewArticle, UpdateArticle, DeleteArticle, getallArticles } = useArticle();
   const [openUpdate, setOpenupdate] = useState<boolean>(false);
   const [UpdateId, setUpdateId] = useState<number>(0);
+  const [pagenumber,setPagenumber] = useState<number>(1)
+ 
   const [formData, setFormData] = useState<FormType>({
     title: "",
     content: "",
     levelRequired: "basic",
   });
+
+const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const newLevel = e.target.value;
+  getallArticles(1,newLevel);
+};
+
+ const handlePage = (direction: 'prev' | 'next') => {
+  if (pagenumber === totalPages && direction === "next"){
+    return
+  }
+  setPagenumber(prev => {
+    const nextPage = direction === 'next' ? prev + 1 : Math.max(1, prev - 1);
+    getallArticles(nextPage);
+    return nextPage;
+  });
+ };
+
+
 
   const handelUpdate = (article:ArticleData) => {   
     setFormData({
@@ -82,9 +103,9 @@ export const AdminArticlepage = () => {
             onChange={handleChange}
             className="w-full border p-2 rounded"
           >
-            <option value="basic">Basic</option>
-            <option value="plus">Plus</option>
-            <option value="full">Full</option>
+            <option value="basic">Fiskepass</option>
+            <option value="plus">Fiskeguide</option>
+            <option value="full">Mästerfiskare</option>
           </select>
         </div>
 
@@ -99,7 +120,18 @@ export const AdminArticlepage = () => {
       {isloading ? (
         <p>Laddar artiklar...</p>
       ) : 
+      <div>
+        <label htmlFor="sort-passes" >Filtrera </label>
+        <select name="sort-passes" id="sort-passes" onChange={(e) => handleLevelChange(e)}>
+          <option value="">----</option>
+          <option value="basic">Fiskepass</option>
+          <option value="plus">Fiskeguide</option>
+          <option value="full">Mästerfiskare</option>
+        </select>
         <ArticleList articles={articles} onUpdate={handelUpdate} onDelete={DeleteArticle}/>
+        <button onClick={()=>handlePage("prev")}>föregående</button>
+        <button onClick={()=>handlePage("next")}>nästa</button>
+      </div>
       }
     </div>
   );

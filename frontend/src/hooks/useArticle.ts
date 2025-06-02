@@ -11,18 +11,24 @@ import type { ArticleData, FormType } from "../models/ArticleOutput";
 export const useArticle = () => {
   const [articles, Dispatch] = useReducer(ArticleReducer, []);
   const [isloading, setIsloading] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     setIsloading(true);
-    getallArticles();
+    getallArticles(1);
   }, []);
 
-  const getallArticles = async () => {
+  const getallArticles = async (pageNumber:number, level?:string) => {
+    console.log(level);
+    const query = `&level=${level}`;
+    
     try {
-      const articles = await getAllArticles();
+     
+      const {totalPages,items} = await getAllArticles(pageNumber,query);
+      setTotalPages(totalPages)
       Dispatch({
         type: IArticle.GET_ARTICLES,
-        payload: articles,
+        payload: items,
       });
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -37,7 +43,6 @@ export const useArticle = () => {
 
   const createNewArticle = async (formData: FormType) => {
     const { id, created } = await createArticle(formData as ArticleData);
-    console.log(id);
     const newArticle: ArticleData = {
       id: id,
       title: formData.title,
@@ -71,9 +76,11 @@ export const useArticle = () => {
   return {
     articles,
     isloading,
+    totalPages,
     Dispatch,
     createNewArticle,
     UpdateArticle,
     DeleteArticle,
+    getallArticles
   };
 };
