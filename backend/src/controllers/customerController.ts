@@ -2,10 +2,18 @@ import { Request, Response } from 'express';
 import { db } from '../config/db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import {
+	LoginRequest,
+	RegisterRequest,
+	UpdateSubscriptionRequest,
+} from '../models/CustomerInterfaces';
 
 // User registration
 
-export const userRegister = async (req: Request, res: Response) => {
+export const userRegister = async (
+	req: Request<{}, {}, RegisterRequest>,
+	res: Response
+) => {
 	const { email, password, subscriptionLevel } = req.body;
 	if (!email || !password) {
 		return res.status(400).json({ message: 'Email and password required' });
@@ -32,7 +40,10 @@ export const userRegister = async (req: Request, res: Response) => {
 
 //User login
 
-export const userLogin = async (req: Request, res: Response) => {
+export const userLogin = async (
+	req: Request<{}, {}, LoginRequest>,
+	res: Response
+) => {
 	const { email, password } = req.body;
 
 	if (!email || !password) {
@@ -65,5 +76,28 @@ export const userLogin = async (req: Request, res: Response) => {
 		res.json({ token });
 	} catch (error) {
 		res.status(500).json({ message: 'Login failed', error });
+	}
+};
+
+// Update subscriptionLevel
+
+export const updateSubscriptionLevel = async (
+	req: Request<{}, {}, UpdateSubscriptionRequest>,
+	res: Response
+) => {
+	const { subscriptionLevel } = req.body;
+	const userId = (req as any).user?.id;
+
+	if (!subscriptionLevel) {
+		return res.status(400).json({ message: 'subscriptionLevel required' });
+	}
+	try {
+		await db.query('UPDATE User SET subscriptionLevel = ? WHERE id = ?', [
+			subscriptionLevel,
+			userId,
+		]);
+		res.json({ message: 'Subscription level updated' });
+	} catch (error) {
+		res.status(500).json({ message: 'Update failed', error });
 	}
 };
