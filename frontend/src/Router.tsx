@@ -6,6 +6,8 @@ import { Dashboard } from './pages/Dashboard';
 import { SingleArticlePage } from './pages/SingleArticlePage';
 import { AdminArticlepage } from './pages/AdminArticlepage';
 import { Testpage } from './pages/testpage';
+import { Register } from './pages/Register';
+
 
 export const router = createBrowserRouter([
 	{
@@ -23,6 +25,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/login',
 				element: <Login />,
+			},
+			{
+				path: '/register',
+				element: <Register />,
 			},
 			{
 				path: '/dashboard',
