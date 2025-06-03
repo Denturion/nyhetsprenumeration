@@ -2,5 +2,6 @@ export interface ArticleInput {
   id?:number;
   title: string;
   content: string;
-  levelRequired: number;
+  levelRequired: "basic" | "plus" | "full";
+  createdAt?:string
 }
