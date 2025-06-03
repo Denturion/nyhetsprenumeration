@@ -4,6 +4,9 @@ import { HomePage } from './pages/HomePage';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SingleArticlePage } from './pages/SingleArticlePage';
+import { Subscriptions } from './pages/Subscriptions';
+import { MySubscriptions } from './pages/MySubscriptions';
+import { SuccessPage } from './pages/SuccessPage';
 
 export const router = createBrowserRouter([
 	{
@@ -26,6 +29,19 @@ export const router = createBrowserRouter([
 				path: '/article/:id',
 				element: <SingleArticlePage />,
 			},
+			{
+				path: '/subscriptions',
+				element: <Subscriptions />,
+			},
+			{
+				path: '/my-subscriptions',
+				element: <MySubscriptions />,
+			},
+			{
+				path: '/success',
+				element: <SuccessPage />,
+			},
+			
 		],
 	},
 ]);
