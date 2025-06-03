@@ -7,13 +7,11 @@ import {
 
 const router = express.Router();
 
-//get routes
+//GET routes
 router.get("/plans", getSubscriptionPlans);
-
-//post routes
-router.post("/create-session", createCheckoutSession);
-
-//get routes
 router.get("/session/:id", getSessionDetails);
+
+//POST routes
+router.post("/create-session", createCheckoutSession);
 
 export default router;
