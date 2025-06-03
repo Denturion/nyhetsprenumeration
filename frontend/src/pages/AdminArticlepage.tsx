@@ -23,7 +23,6 @@ export const AdminArticlepage = () => {
       setSearchQuery(inputValue)
       getallArticles(1,undefined,inputValue)
     }, 800);
-
     return () => clearTimeout(timeout);
   }, [inputValue]);
 
@@ -32,7 +31,7 @@ export const AdminArticlepage = () => {
 const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   const newLevel = e.target.value;
   setSelectedLevel(newLevel)
-  getallArticles(1,newLevel);
+  getallArticles(1,newLevel,searchQuery);
 };
 
  const handlePage = (direction: 'prev' | 'next') => {
