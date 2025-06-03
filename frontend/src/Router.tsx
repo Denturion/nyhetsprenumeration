@@ -5,6 +5,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SingleArticlePage } from './pages/SingleArticlePage';
 import { AdminArticlepage } from './pages/AdminArticlepage';
+import { Testpage } from './pages/testpage';
 
 export const router = createBrowserRouter([
 	{
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/',
 				element: <HomePage />,
+			},
+			{
+				path: '/test',
+				element: <Testpage/>,
 			},
 			{
 				path: '/login',

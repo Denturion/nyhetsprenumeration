@@ -82,72 +82,105 @@ const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-lime-500">
-      <h1 className="text-2xl font-bold mb-4">Admin – Artiklar</h1>
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-6 max-w-4xl mx-auto">
+  <h1 className="text-2xl font-bold mb-6 text-white text-center">Admin – Artiklar</h1>
 
-      <form onSubmit={handleSubmit} className="bg-white shadow p-4 rounded mb-6 space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Titel</label>
-          <input
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+  <form
+    onSubmit={handleSubmit}
+    className="bg-gray-800 shadow-md p-6 rounded-lg mb-6 space-y-4"
+  >
+    <div>
+      <label className="block mb-1 font-medium text-gray-200">Titel</label>
+      <input
+        name="title"
+        value={formData.title}
+        onChange={handleChange}
+        required
+        className="w-full bg-gray-700 border border-gray-600 p-2 rounded text-white focus:outline-none focus:ring focus:ring-blue-500"
+      />
+    </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Innehåll</label>
-          <textarea
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+    <div>
+      <label className="block mb-1 font-medium text-gray-200">Innehåll</label>
+      <textarea
+        name="content"
+        value={formData.content}
+        onChange={handleChange}
+        required
+        className="w-full h-64 bg-gray-700 border border-gray-600 p-2 rounded text-white focus:outline-none focus:ring focus:ring-blue-500"
+      />
+    </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Åtkomstnivå</label>
-          <select
-            name="levelRequired"
-            value={formData.levelRequired}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value="basic">Fiskepass</option>
-            <option value="plus">Fiskeguide</option>
-            <option value="full">Mästerfiskare</option>
-          </select>
-        </div>
+    <div>
+      <label className="block mb-1 font-medium text-gray-200">Åtkomstnivå</label>
+      <select
+        name="levelRequired"
+        value={formData.levelRequired}
+        onChange={handleChange}
+        className="w-full bg-gray-700 border border-gray-600 p-2 rounded text-white"
+      >
+        <option value="basic">Fiskepass</option>
+        <option value="plus">Fiskeguide</option>
+        <option value="full">Mästerfiskare</option>
+      </select>
+    </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    <button
+      type="submit"
+      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition w-full"
+    >
+      {!openUpdate ? "Skapa artikel" : "Uppdatera"}
+    </button>
+  </form>
+
+  {isloading ? (
+    <p className="text-gray-400">Laddar artiklar...</p>
+  ) : (
+    <div className="space-y-4">
+      <div className="flex flex-col xs:flex-row gap-4 mb-4">
+        <select
+          name="sort-passes"
+          id="sort-passes"
+          onChange={handleLevelChange}
+          className="bg-gray-700 border border-gray-600 p-2 rounded text-white"
         >
-         {!openUpdate ? "Skapa artikel" : "updatera"}
-        </button>
-      </form>
-
-      {isloading ? (
-        <p>Laddar artiklar...</p>
-      ) : 
-      <div>
-        <label htmlFor="sort-passes" >Filtrera </label>
-        <select name="sort-passes" id="sort-passes" onChange={(e) => handleLevelChange(e)}>
-          <option value="">----</option>
+          <option value="">--Filter--</option>
           <option value="basic">Fiskepass</option>
           <option value="plus">Fiskeguide</option>
           <option value="full">Mästerfiskare</option>
         </select>
-        <input placeholder="Sök på titel" type="text" value={inputValue} onChange={(e)=>setInputValue(e.target.value)}></input>
-        {articles.length === 0 ? <p>Kunde inte hitta några artiklar</p> : 
-        <ArticleList articles={articles} onUpdate={handelUpdate} onDelete={DeleteArticle}/>}
-        <button onClick={()=>handlePage("prev")}>föregående</button>
-        <button onClick={()=>handlePage("next")}>nästa</button>
+        <input
+          placeholder="Sök på titel"
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          className="flex-1 bg-gray-700 border border-gray-600 p-2 rounded text-white"
+        />
       </div>
-      }
+
+      {articles.length === 0 ? (
+        <p className="text-red-400">Kunde inte hitta några artiklar</p>
+      ) : (
+        <ArticleList articles={articles} onUpdate={handelUpdate} onDelete={DeleteArticle} />
+      )}
+
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={() => handlePage("prev")}
+          className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+        >
+          Föregående
+        </button>
+        <button
+          onClick={() => handlePage("next")}
+          className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+        >
+          Nästa
+        </button>
+      </div>
     </div>
+  )}
+</div>
+
   );
 };
