@@ -19,6 +19,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
 
   if (!user) {
   res.status(401).json({ message: "Inte inloggad" });
+  return;
   }
 
 
@@ -27,8 +28,11 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
 
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
+  const search = (req.query.search as string)?.trim();
   const offset = (page - 1) * limit;
 
+  let searchClause = "";
+  let searchParams: any[] = [];
   let allowedLevels: string[] = [];
 
   if (isAdmin) {
@@ -43,8 +47,14 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
     const userIndex = allLevels.indexOf(user.levelRequired);
     allowedLevels = allLevels.slice(0, userIndex + 1);
   }
+
+  if (search) {
+  searchClause = " AND (title LIKE ?)";
+  searchParams.push(`%${search}%`);
+}
+
   const placeholders = allowedLevels.map(() => "?").join(", ");
-  const whereClause = `WHERE levelRequired IN (${placeholders})`;
+  const whereClause = `WHERE levelRequired IN (${placeholders})${searchClause}`;
 
   const getArticlesQuery = `
     SELECT * FROM Huggtid.Article
@@ -58,8 +68,8 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
     ${whereClause}
   `;
 
-  const dataParams = [...allowedLevels, limit, offset];
-  const countParams = [...allowedLevels];
+  const dataParams = [...allowedLevels,...searchParams, limit, offset];
+  const countParams = [...allowedLevels,...searchParams];
 
   try {
     const [articles] = await db.query(getArticlesQuery, dataParams);

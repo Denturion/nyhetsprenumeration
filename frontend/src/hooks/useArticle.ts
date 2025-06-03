@@ -18,13 +18,10 @@ export const useArticle = () => {
     getallArticles(1);
   }, []);
 
-  const getallArticles = async (pageNumber:number, level?:string) => {
-    console.log(level);
-    const query = `&level=${level}`;
-    
+  const getallArticles = async (pageNumber:number, level?:string, search?:string) => {
     try {
      
-      const {totalPages,items} = await getAllArticles(pageNumber,query);
+      const {totalPages,items} = await getAllArticles(pageNumber,level,search);
       setTotalPages(totalPages)
       Dispatch({
         type: IArticle.GET_ARTICLES,
@@ -42,18 +39,8 @@ export const useArticle = () => {
   };
 
   const createNewArticle = async (formData: FormType) => {
-    const { id, created } = await createArticle(formData as ArticleData);
-    const newArticle: ArticleData = {
-      id: id,
-      title: formData.title,
-      content: formData.content,
-      levelRequired: formData.levelRequired,
-      createdAt: created,
-    };
-    Dispatch({
-      type: IArticle.ADD_ARTICLE,
-      payload: newArticle,
-    });
+    await createArticle(formData as ArticleData);
+   await getallArticles(1);
   };
 
   const UpdateArticle = async (UpdateId:number,formData:FormType) => {
@@ -67,10 +54,7 @@ export const useArticle = () => {
 
   const DeleteArticle = async (id: number) => {
     await deleteArticleById(id);
-    Dispatch({
-      type: IArticle.REMOVE_ARTICLE,
-      payload: { id: id } as ArticleData,
-    });
+    await getallArticles(1);
   };
 
   return {

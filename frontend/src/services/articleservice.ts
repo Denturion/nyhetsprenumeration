@@ -13,8 +13,17 @@ const handleRequest = async <T>(request: Promise<T>): Promise<T> => {
 };
 
 
-export const getAllArticles = async (page:number,query?:string):Promise<Articlepagination> => {
-    return handleRequest(getData(`${BASE_URL}/articles?page=${page}&limit=8${query}`));
+export const getAllArticles = async (page:number,query?:string,searchquery?:string):Promise<Articlepagination> => {
+
+   let url = `${BASE_URL}/articles?page=${page}&limit=8`;
+
+  if (query) {
+    url += `&level=${query}`;
+  }
+  if (searchquery) {
+    url += `&search=${searchquery}`;
+  }
+    return handleRequest(getData(url));
 }
 
 export const getArticleById = async (id:number):Promise<ArticleData> => {

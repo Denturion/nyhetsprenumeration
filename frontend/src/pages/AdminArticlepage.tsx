@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { useArticle } from "../hooks/useArticle";
 import type { ArticleData, FormType } from "../models/ArticleOutput";
 import { ArticleList } from "../components/ArticleList";
@@ -10,12 +10,24 @@ export const AdminArticlepage = () => {
   const [UpdateId, setUpdateId] = useState<number>(0);
   const [pagenumber,setPagenumber] = useState<number>(1)
   const [selectedLevel, setSelectedLevel] = useState<string>("");
- 
+  const [inputValue, setInputValue] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [formData, setFormData] = useState<FormType>({
     title: "",
     content: "",
     levelRequired: "basic",
   });
+  
+   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearchQuery(inputValue)
+      getallArticles(1,undefined,inputValue)
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [inputValue]);
+
+
 
 const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   const newLevel = e.target.value;
@@ -29,7 +41,7 @@ const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
   }
   setPagenumber(prev => {
     const nextPage = direction === 'next' ? prev + 1 : Math.max(1, prev - 1);
-    getallArticles(nextPage,selectedLevel);
+    getallArticles(nextPage,selectedLevel,searchQuery);
     return nextPage;
   });
  };
@@ -130,7 +142,9 @@ const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
           <option value="plus">Fiskeguide</option>
           <option value="full">Mästerfiskare</option>
         </select>
-        <ArticleList articles={articles} onUpdate={handelUpdate} onDelete={DeleteArticle}/>
+        <input placeholder="Sök på titel" type="text" value={inputValue} onChange={(e)=>setInputValue(e.target.value)}></input>
+        {articles.length === 0 ? <p>Kunde inte hitta några artiklar</p> : 
+        <ArticleList articles={articles} onUpdate={handelUpdate} onDelete={DeleteArticle}/>}
         <button onClick={()=>handlePage("prev")}>föregående</button>
         <button onClick={()=>handlePage("next")}>nästa</button>
       </div>
