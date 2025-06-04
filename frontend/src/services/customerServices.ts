@@ -10,6 +10,8 @@ export async function register(
 	password: string,
 	subscriptionLevel: string
 ): Promise<{ message: string }> {
+	console.log(`${API_URL}/customers/register`);
+	
 	const res = await axios.post(`${API_URL}/customers/register`, {
 		email,
 		password,

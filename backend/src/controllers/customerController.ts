@@ -15,6 +15,7 @@ export const userRegister = async (
 	res: Response
 ): Promise<void> => {
 	const { email, password, subscriptionLevel } = req.body;
+
 	if (!email || !password) {
 		res.status(400).json({ message: 'Email and password required' });
 		return;
@@ -69,12 +70,13 @@ export const userLogin = async (
 			res.status(401).json({ message: 'Invalid credentials' });
 			return;
 		}
-
+		
 		const token = jwt.sign(
 			{
 				id: user.id,
 				email: user.email,
 				subscriptionLevel: user.subscriptionLevel,
+				role:user.role
 			},
 			process.env.JWT_SECRET || 'secret',
 			{ expiresIn: '1d' }
