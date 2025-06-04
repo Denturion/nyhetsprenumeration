@@ -41,7 +41,7 @@ export const useArticle = () => {
 
   const getoneArticleById = async (id:number) => {
     const article = await getArticleById(id)
-    return article[0];
+    return article;
     
   }
 

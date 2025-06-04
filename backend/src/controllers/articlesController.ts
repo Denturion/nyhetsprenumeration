@@ -94,12 +94,29 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
 export const getArticleById = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;
     const user = req.user;
-    console.log(user);
+    const userLevel = user?.subscriptionLevel;
+    const role = user?.role;
     
     let sql = "SELECT * FROM Huggtid.Article WHERE id = ?"
     try {
      const [rows] = await db.query(sql, [id]);
-    res.status(200).json(rows)
+     const article = (rows as any[])[0];
+     
+     if (!article) {
+      res.status(404).json({ message: "Artikeln hittades inte" });
+      return;
+    }
+
+     const accessLevels = ["basic", "plus", "full"];
+     const requiredIndex = accessLevels.indexOf(article.levelRequired);
+     const userIndex = accessLevels.indexOf(userLevel);
+     
+       if (role !== "admin" && (userIndex === -1 || userIndex < requiredIndex)) {
+      res.status(403).json({ message: "Du har inte behörighet att läsa denna artikel" });
+      return;
+    }
+
+    res.status(200).json(article)
     
  } catch (error) {
     res.status(400).json({
