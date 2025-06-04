@@ -4,18 +4,15 @@ import { toError } from '../utility/error';
 import { ArticleInput } from '../models/ArticleInput';
 import { ArticleParamas } from '../models/ArticleParams';
 import { ResultSetHeader } from 'mysql2';
+import { log } from 'console';
 
 
 export const getArticles = async (req: Request, res: Response): Promise<void> => {
-  //byta till session när login är klart
-  //jag har byggt objektet som nedan
-  
-  /* const user = req.session.user; */
-
-  const user = {
-    role: "admin",              // "admin" eller "user"
-    levelRequired: "basic"   // "basic", "plus" eller "full"
-  };
+   const user = req.user; 
+/*   const user =  {
+    role: req.user,              // "admin" eller "user"
+    subscriptionLevel: "basic"   // "basic", "plus" eller "full"
+  }; */
 
   if (!user) {
   res.status(401).json({ message: "Inte inloggad" });
@@ -44,7 +41,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
       allowedLevels = [...allLevels]; 
     }
   } else {
-    const userIndex = allLevels.indexOf(user.levelRequired);
+    const userIndex = allLevels.indexOf(user.subscriptionLevel);
     allowedLevels = allLevels.slice(0, userIndex + 1);
   }
 
@@ -96,6 +93,9 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
 
 export const getArticleById = async (req: Request, res: Response): Promise<void> => {
     const id = req.params.id;
+    const user = req.user;
+    console.log(user);
+    
     let sql = "SELECT * FROM Huggtid.Article WHERE id = ?"
     try {
      const [rows] = await db.query(sql, [id]);
@@ -114,12 +114,13 @@ export const createArticle = async (req: Request<{}, {}, ArticleInput>, res: Res
 let title = req.body.title;
 let content = req.body.content;
 let levelRequired = req.body.levelRequired;
+let image = req.body.image;
 
 let sql = `INSERT INTO Huggtid.Article
-            (title, content, levelRequired)
-             VALUES ( ?, ?, ?)`;
+            (title, content, levelRequired,image)
+             VALUES ( ?, ?, ?, ?)`;
 try {
-    const [result] = await db.query<ResultSetHeader>(sql,[ title,content, levelRequired])
+    const [result] = await db.query<ResultSetHeader>(sql,[ title,content, levelRequired,image])
     
     sql = "SELECT * FROM Huggtid.Article WHERE id = ?"
     const [rows] = await db.query(sql, result.insertId)
@@ -145,13 +146,14 @@ const id = req.params.id;
 let title = req.body.title;
 let content = req.body.content;
 let levelRequired = req.body.levelRequired;
+let image = req.body.image
 
 try {
     let sql = `UPDATE Huggtid.Article
-    SET title = ? , content = ? , levelRequired= ? 
+    SET title = ? , content = ? , levelRequired= ? , image = ?
     WHERE id = ?`
 
-    const [result] =await db.query<ResultSetHeader>(sql,[title, content, levelRequired, parseInt(id) ])
+    const [result] =await db.query<ResultSetHeader>(sql,[title, content, levelRequired,image, parseInt(id) ])
    
     sql = "SELECT * FROM Huggtid.Article WHERE id = ?"
     const [updatedRows] = await db.query(sql, [id])

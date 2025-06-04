@@ -15,7 +15,7 @@ const handleRequest = async <T>(request: Promise<T>): Promise<T> => {
 
 export const getAllArticles = async (page:number,query?:string,searchquery?:string):Promise<Articlepagination> => {
 
-   let url = `${BASE_URL}/articles?page=${page}&limit=8`;
+   let url = `/articles?page=${page}&limit=8`;
 
   if (query) {
     url += `&level=${query}`;
@@ -26,7 +26,7 @@ export const getAllArticles = async (page:number,query?:string,searchquery?:stri
     return handleRequest(getData(url));
 }
 
-export const getArticleById = async (id:number):Promise<ArticleData> => {
+export const getArticleById = async (id:number):Promise<ArticleData[]> => {
     return handleRequest(getData(`${BASE_URL}/articles/${id}`));
 }
 
