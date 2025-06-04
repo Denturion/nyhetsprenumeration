@@ -8,7 +8,9 @@ export const Subscriptions = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/stripe/plans");
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/stripe/plans`
+        );
         setPlans(res.data);
         console.log("Prenumerationer hämtade:", res.data);
       } catch (err: any) {
@@ -20,12 +22,20 @@ export const Subscriptions = () => {
   }, []);
 
   const handleSubscribe = async (priceId: string) => {
+    const registration = sessionStorage.getItem("registration");
+
+    if (!registration) {
+      console.error("Ingen registrering hittades i sessionStorage");
+      return;
+    }
+
+    const { email } = JSON.parse(registration);
     try {
       const res = await axios.post(
-        "http://localhost:5000/stripe/create-session",
+        `${import.meta.env.VITE_BACKEND_URL}/stripe/create-session`,
         {
           priceId,
-          customerEmail: "kund@example.com", // Ersätt med inloggad användares e-post
+          customerEmail: email,
         }
       );
 
