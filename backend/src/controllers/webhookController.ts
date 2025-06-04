@@ -83,7 +83,7 @@ export const handleStripeWebhook = async (
           [user.id, paymentIntentId, stripeStatus]
         );
 
-        console.log("✅ User and payment inserted:", {
+        console.log("User and payment inserted:", {
           email: customerEmail,
           newLevel,
           stripeStatus,
@@ -118,12 +118,12 @@ export const handleStripeWebhook = async (
           [user.id]
         );
 
-        console.log("✅ Subscription fully canceled for user:", user.id);
+        console.log("Subscription fully canceled for user:", user.id);
         break;
       }
-      
+
       default:
-        console.log(`ℹ️  Event type '${eventType}' not handled.`);
+        console.log(`Event type '${eventType}' not handled.`);
         break;
     }
 
