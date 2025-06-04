@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+	cancelSubscription,
 	updateSubscriptionLevel,
 	userLogin,
 	userRegister,
@@ -10,6 +11,7 @@ const router = express.Router();
 
 router.post('/register', userRegister);
 router.post('/login', userLogin);
+router.post('/cancel-subscription', cancelSubscription);
 
 router.put('/subscription', authenticateJWT, updateSubscriptionLevel);
 
