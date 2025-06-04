@@ -75,6 +75,7 @@ export const userLogin = async (
 				id: user.id,
 				email: user.email,
 				subscriptionLevel: user.subscriptionLevel,
+				subscriptionExpiresAt: user.subscriptionExpiresAt,
 			},
 			process.env.JWT_SECRET || 'secret',
 			{ expiresIn: '1d' }
