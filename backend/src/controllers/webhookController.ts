@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import stripe from "../config/stripe";
 import { db } from "../config/db";
-import { IPlan } from "../interfaces/IPlan"; 
 import { IUser } from "../interfaces/IUser";
 import Stripe from "stripe";
 
-export const handleStripeWebhook = async (req: Request, res: Response): Promise<void> => {
+export const handleStripeWebhook = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const sig = req.headers["stripe-signature"] as string;
 
   try {
@@ -19,9 +21,10 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
       const session = event.data.object as Stripe.Checkout.Session;
       const customerEmail = session.customer_email;
       const subscriptionId = session.subscription as string;
-      const paymentIntentId = session.payment_intent as string || session.id;
+      const paymentIntentId = (session.payment_intent as string) || session.id;
 
       if (!customerEmail || !subscriptionId) {
+        console.error("Missing email or subscriptionId in session.");
         res.status(400).json({ error: "Missing email or subscriptionId" });
         return;
       }
@@ -29,13 +32,17 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
       const priceId = subscription.items.data[0].price.id;
 
-      const [planRows] = await db.query<IPlan[]>(
-        "SELECT * FROM subscription_plans WHERE id = ?",
-        [priceId]
-      );
-      const plan = planRows[0];
-      if (!plan) {
-        res.status(400).json({ error: "No matching plan found" });
+      const priceMap: Record<string, "basic" | "plus" | "full"> = {
+        price_1RUPsS4E2OXMiKqH6Wx2FQIJ: "basic",
+        price_1RUOIJ4E2OXMiKqHqFEh7JVs: "plus",
+        price_1RUOKf4E2OXMiKqH0ZCBA7ea: "full",
+      };
+
+      const newLevel = priceMap[priceId];
+
+      if (!newLevel) {
+        console.error("Unknown priceId:", priceId);
+        res.status(400).json({ error: "Unknown subscription level" });
         return;
       }
 
@@ -44,24 +51,32 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
         [customerEmail]
       );
       if (userRows.length === 0) {
+        console.error("User not found for email:", customerEmail);
         res.status(400).json({ error: "User not found" });
         return;
       }
 
       const user = userRows[0];
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); 
 
       await db.query(
-        `UPDATE User SET subscriptionLevel = ?, subscriptionExpiresAt = ?, isActive = 1 WHERE id = ?`,
-        [plan.name.toLowerCase(), expiresAt, user.id]
+        `UPDATE User 
+         SET subscriptionLevel = ?, subscriptionExpiresAt = ?, isActive = 1 
+         WHERE id = ?`,
+        [newLevel, expiresAt, user.id]
       );
 
       await db.query(
-        `INSERT INTO Payment (userId, stripePaymentId, status) VALUES (?, ?, 'succeeded')`,
+        `INSERT INTO Payment (userId, stripePaymentId, status) 
+         VALUES (?, ?, 'succeeded')`,
         [user.id, paymentIntentId]
       );
 
-      console.log("User and payment updated.");
+      console.log("User and payment updated:", {
+        email: customerEmail,
+        newLevel,
+        expiresAt,
+      });
     }
 
     res.status(200).json({ received: true });
@@ -75,4 +90,3 @@ export const handleStripeWebhook = async (req: Request, res: Response): Promise<
     }
   }
 };
-
