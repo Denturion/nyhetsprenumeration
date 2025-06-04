@@ -17,63 +17,114 @@ export const handleStripeWebhook = async (
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const customerEmail = session.customer_email;
-      const subscriptionId = session.subscription as string;
-      const paymentIntentId = (session.payment_intent as string) || session.id;
+    const eventType = event.type;
+    const data = event.data.object as any;
 
-      if (!customerEmail || !subscriptionId) {
-        console.error("Missing email or subscriptionId in session.");
-        res.status(400).json({ error: "Missing email or subscriptionId" });
-        return;
+    switch (eventType) {
+      case "checkout.session.completed": {
+        const session = data as Stripe.Checkout.Session;
+        const customerEmail = session.customer_email;
+        const subscriptionId = session.subscription as string;
+        const paymentIntentId =
+          (session.payment_intent as string) || session.id;
+
+        if (!customerEmail || !subscriptionId) {
+          console.error("Missing email or subscriptionId in session.");
+          res.status(400).json({ error: "Missing email or subscriptionId" });
+          return;
+        }
+
+        const subscription = await stripe.subscriptions.retrieve(
+          subscriptionId
+        );
+        const priceId = subscription.items.data[0].price.id;
+
+        const priceMap: Record<string, "basic" | "plus" | "full"> = {
+          price_1RUPsS4E2OXMiKqH6Wx2FQIJ: "basic",
+          price_1RUOIJ4E2OXMiKqHqFEh7JVs: "plus",
+          price_1RUOKf4E2OXMiKqH0ZCBA7ea: "full",
+        };
+
+        const newLevel = priceMap[priceId];
+
+        if (!newLevel) {
+          console.error("Unknown priceId:", priceId);
+          res.status(400).json({ error: "Unknown subscription level" });
+          return;
+        }
+
+        const [userRows] = await db.query<IUser[]>(
+          "SELECT * FROM User WHERE email = ?",
+          [customerEmail]
+        );
+
+        if (userRows.length === 0) {
+          console.error("User not found for email:", customerEmail);
+          res.status(400).json({ error: "User not found" });
+          return;
+        }
+
+        const user = userRows[0];
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+        await db.query(
+          `UPDATE User 
+           SET subscriptionLevel = ?, subscriptionExpiresAt = ?, isActive = 1, stripeSubscriptionId = ?
+           WHERE id = ?`,
+          [newLevel, expiresAt, subscription.id, user.id]
+        );
+
+        const stripeStatus =
+          session.status === "complete" ? "succeeded" : "failed";
+
+        await db.query(
+          `INSERT INTO Payment (userId, stripePaymentId, status) 
+           VALUES (?, ?, ?)`,
+          [user.id, paymentIntentId, stripeStatus]
+        );
+
+        console.log("✅ User and payment inserted:", {
+          email: customerEmail,
+          newLevel,
+          stripeStatus,
+          subscriptionId,
+        });
+        break;
       }
 
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-      const priceId = subscription.items.data[0].price.id;
+      case "customer.subscription.deleted": {
+        const subscription = data as Stripe.Subscription;
+        const stripeSubId = subscription.id;
 
-      const priceMap: Record<string, "basic" | "plus" | "full"> = {
-        price_1RUPsS4E2OXMiKqH6Wx2FQIJ: "basic",
-        price_1RUOIJ4E2OXMiKqHqFEh7JVs: "plus",
-        price_1RUOKf4E2OXMiKqH0ZCBA7ea: "full",
-      };
+        const [userRows] = await db.query<IUser[]>(
+          "SELECT id FROM User WHERE stripeSubscriptionId = ?",
+          [stripeSubId]
+        );
 
-      const newLevel = priceMap[priceId];
+        if (userRows.length === 0) {
+          console.warn("No user found for subscriptionId:", stripeSubId);
+          break;
+        }
 
-      if (!newLevel) {
-        console.error("Unknown priceId:", priceId);
-        res.status(400).json({ error: "Unknown subscription level" });
-        return;
+        const user = userRows[0];
+
+        await db.query(
+          `UPDATE User
+           SET subscriptionLevel = 'free',
+               subscriptionExpiresAt = NULL,
+               isActive = 0,
+               stripeSubscriptionId = NULL
+           WHERE id = ?`,
+          [user.id]
+        );
+
+        console.log("✅ Subscription fully canceled for user:", user.id);
+        break;
       }
-
-      const [userRows] = await db.query<IUser[]>(
-        "SELECT * FROM User WHERE email = ?",
-        [customerEmail]
-      );
-
-      if (userRows.length === 0) {
-        console.error("User not found for email:", customerEmail);
-        res.status(400).json({ error: "User not found" });
-        return;
-      }
-
-      const user = userRows[0];
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); 
-
-      await db.query(
-        `UPDATE User 
-         SET subscriptionLevel = ?, subscriptionExpiresAt = ?, isActive = 1 
-         WHERE id = ?`,
-        [newLevel, expiresAt, user.id]
-      );
-
-      const stripeStatus = session.status === "complete" ? "succeeded" : "failed";
-
-      await db.query(
-        `INSERT INTO Payment (userId, stripePaymentId, status) 
-         VALUES (?, ?, ?)`,
-        [user.id, paymentIntentId, stripeStatus]
-      );
+      
+      default:
+        console.log(`ℹ️  Event type '${eventType}' not handled.`);
+        break;
     }
 
     res.status(200).json({ received: true });
@@ -87,4 +138,3 @@ export const handleStripeWebhook = async (
     }
   }
 };
-
