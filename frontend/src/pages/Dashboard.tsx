@@ -6,7 +6,7 @@ export const Dashboard = () => {
   const [user, setUser] = useState<{
     email?: String;
     subscriptionLevel?: string;
-	subscriptionExpiresAt?: string;
+    subscriptionExpiresAt?: string;
   } | null>(null);
 
   useEffect(() => {
@@ -16,6 +16,38 @@ export const Dashboard = () => {
       setUser(payload);
     }
   }, []);
+
+  const handleCancel = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("Ingen token hittades. Logga in igen.");
+      return;
+    }
+
+    try {
+      await fetch("http://localhost:5000/customers/cancel-subscription", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser((prev) =>
+        prev
+          ? {
+              ...prev,
+              subscriptionLevel: "free",
+              subscriptionExpiresAt: undefined,
+            }
+          : null
+      );
+
+      alert("Prenumerationen har avslutats.");
+    } catch (error) {
+      console.error("Kunde inte avsluta prenumeration:", error);
+      alert("Något gick fel.");
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
@@ -32,6 +64,12 @@ export const Dashboard = () => {
               ? new Date(user.subscriptionExpiresAt).toLocaleDateString("sv-SE")
               : "okänt"}
           </p>
+          <button
+            onClick={handleCancel}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            Ta bort prenumeration
+          </button>
         </div>
       ) : (
         <div>
