@@ -8,12 +8,14 @@ export const SuccessPage = () => {
   const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
+    sessionStorage.removeItem("registration");
+
     const fetchSession = async () => {
       if (!sessionId) return;
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/stripe/session/${sessionId}`
+          `${import.meta.env.VITE_BACKEND_URL}stripe/session/${sessionId}`
         );
         setEmail(res.data.customer_email);
       } catch (err) {
