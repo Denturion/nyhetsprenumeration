@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import stripe from "../config/stripe";
 import { db } from "../config/db";
-import { IPlan } from "../interfaces/IPlan";
 import { IUser } from "../interfaces/IUser";
 import Stripe from "stripe";
 
@@ -18,30 +17,20 @@ export const handleStripeWebhook = async (
       process.env.STRIPE_WEBHOOK_SECRET!
     );
 
-    console.log("🔔 Stripe event received:", event.type);
-
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const customerEmail = session.customer_email;
       const subscriptionId = session.subscription as string;
       const paymentIntentId = (session.payment_intent as string) || session.id;
 
-      console.log("📨 Webhook session data:", {
-        email: customerEmail,
-        subscription: subscriptionId,
-      });
-
       if (!customerEmail || !subscriptionId) {
-        console.error("❌ Missing email or subscriptionId in session.");
+        console.error("Missing email or subscriptionId in session.");
         res.status(400).json({ error: "Missing email or subscriptionId" });
         return;
       }
 
-      
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
       const priceId = subscription.items.data[0].price.id;
-
-      console.log("💳 Stripe subscription info:", { priceIdUsed: priceId });
 
       const priceMap: Record<string, "basic" | "plus" | "full"> = {
         price_1RUPsS4E2OXMiKqH6Wx2FQIJ: "basic",
@@ -52,7 +41,7 @@ export const handleStripeWebhook = async (
       const newLevel = priceMap[priceId];
 
       if (!newLevel) {
-        console.error("❌ Unknown priceId:", priceId);
+        console.error("Unknown priceId:", priceId);
         res.status(400).json({ error: "Unknown subscription level" });
         return;
       }
@@ -62,7 +51,7 @@ export const handleStripeWebhook = async (
         [customerEmail]
       );
       if (userRows.length === 0) {
-        console.error("❌ User not found for email:", customerEmail);
+        console.error("User not found for email:", customerEmail);
         res.status(400).json({ error: "User not found" });
         return;
       }
@@ -83,7 +72,7 @@ export const handleStripeWebhook = async (
         [user.id, paymentIntentId]
       );
 
-      console.log("✅ User and payment updated:", {
+      console.log("User and payment updated:", {
         email: customerEmail,
         newLevel,
         expiresAt,
@@ -93,10 +82,10 @@ export const handleStripeWebhook = async (
     res.status(200).json({ received: true });
   } catch (err: unknown) {
     if (err instanceof Error) {
-      console.error("❌ Webhook error:", err.message);
+      console.error("Webhook error:", err.message);
       res.status(400).send(`Webhook Error: ${err.message}`);
     } else {
-      console.error("❌ Unknown webhook error:", err);
+      console.error("Unknown webhook error:", err);
       res.status(400).send("Unknown error occurred");
     }
   }
