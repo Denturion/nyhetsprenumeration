@@ -1,13 +1,18 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useArticle } from '../hooks/useArticle';
+
+import { DashboardArticles } from '../components/DashboardArticles';
 
 export const Dashboard = () => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState<{
-    email?: String;
-    subscriptionLevel?: string;
+	const navigate = useNavigate();
+	const [user, setUser] = useState<{
+		email?: String;
+		subscriptionLevel?: string;
     subscriptionExpiresAt?: string;
-  } | null>(null);
+	} | null>(null);
+	const { articles, isloading, getallArticles } = useArticle();
+
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -85,4 +90,5 @@ export const Dashboard = () => {
       )}
     </div>
   );
+
 };
