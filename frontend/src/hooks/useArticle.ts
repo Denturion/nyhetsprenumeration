@@ -4,6 +4,7 @@ import {
   createArticle,
   deleteArticleById,
   getAllArticles,
+  getArticleById,
   updateArticleById,
 } from "../services/articleservice";
 import type { ArticleData, FormType } from "../models/ArticleOutput";
@@ -38,6 +39,12 @@ export const useArticle = () => {
     }
   };
 
+  const getoneArticleById = async (id:number) => {
+    const article = await getArticleById(id)
+    return article;
+    
+  }
+
   const createNewArticle = async (formData: FormType) => {
     await createArticle(formData as ArticleData);
    await getallArticles(1);
@@ -65,6 +72,7 @@ export const useArticle = () => {
     createNewArticle,
     UpdateArticle,
     DeleteArticle,
-    getallArticles
+    getallArticles,
+    getoneArticleById
   };
 };
