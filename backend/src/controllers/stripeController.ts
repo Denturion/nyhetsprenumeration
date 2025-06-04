@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import stripe from "../config/stripe";
 import { getAllSubscriptionPlans } from "../models/subscriptionPlanModel";
 
-export const createCheckoutSession = async (req: Request, res: Response): Promise<void> => {
+export const createCheckoutSession = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { priceId, customerEmail } = req.body;
 
   if (!priceId || !customerEmail) {
@@ -12,12 +15,17 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
 
   try {
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode: "subscription", 
       payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
-      customer_email: customerEmail,
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+      line_items: [
+        {
+          price: priceId, 
+          quantity: 1,
+        },
+      ],
+      customer_email: customerEmail, 
+      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`, 
+      cancel_url: `${process.env.FRONTEND_URL}/subscriptions`,
     });
 
     res.json({ url: session.url });
@@ -27,12 +35,17 @@ export const createCheckoutSession = async (req: Request, res: Response): Promis
       res.status(500).json({ error: err.message });
     } else {
       console.error("Unknown error creating Stripe session:", err);
-      res.status(500).json({ error: "Något gick fel vid skapandet av session" });
+      res
+        .status(500)
+        .json({ error: "Något gick fel vid skapandet av session" });
     }
   }
 };
 
-export const getSubscriptionPlans = async (req: Request, res: Response): Promise<void> => {
+export const getSubscriptionPlans = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const plans = await getAllSubscriptionPlans();
     res.json(plans);
@@ -47,7 +60,10 @@ export const getSubscriptionPlans = async (req: Request, res: Response): Promise
   }
 };
 
-export const getSessionDetails = async (req: Request, res: Response): Promise<void> => {
+export const getSessionDetails = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params;
 
   try {
@@ -63,5 +79,3 @@ export const getSessionDetails = async (req: Request, res: Response): Promise<vo
     }
   }
 };
-
-
