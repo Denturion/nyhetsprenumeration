@@ -1,8 +1,25 @@
+import { useNavigate } from 'react-router-dom';
+
 export const HomePage = () => {
+	const navigate = useNavigate();
 	return (
 		<div className='flex flex-col items-center justify-center h-screen'>
-			<h1 className='text-4xl font-bold mb-4'>Home Page</h1>
-			<p className='text-lg'>Welcome to the home page!</p>
+			<h1 className='text-4xl font-bold mb-4'>Huggtid</h1>
+			<p className='text-lg'>Välkommen!</p>
+			<button
+				type='button'
+				onClick={() => navigate('/login')}
+				className='mt-4 w-40 bg-blue-600 text-white py-2 rounded shadow hover:bg-blue-700 transition duration-200'
+			>
+				Logga in
+			</button>
+			<button
+				type='button'
+				onClick={() => navigate('/register')}
+				className='mt-4 w-40 bg-blue-600 text-white py-2 rounded shadow hover:bg-blue-700 transition duration-200'
+			>
+				Registrera dig
+			</button>
 		</div>
 	);
 };

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../services/customerServices';
 
 export const Register = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [subscriptionLevel, setSubscriptionLevel] = useState('basic');
+	const [subscriptionLevel] = useState('free');
 	const [message, setMessage] = useState('');
 	const navigate = useNavigate();
 
@@ -12,11 +13,17 @@ export const Register = () => {
 		e.preventDefault();
 		setMessage('');
 
-		sessionStorage.setItem(
-			'registration',
-			JSON.stringify({ email, password, subscriptionLevel })
-		);
-		navigate('/subscriptions');
+		try {
+			await register(email, password, subscriptionLevel);
+
+			sessionStorage.setItem(
+				'registration',
+				JSON.stringify({ email, subscriptionLevel })
+			);
+			navigate('/subscriptions');
+		} catch (error: any) {
+			setMessage(error.response?.data?.message || 'Registrering misslyckades');
+		}
 	};
 
 	return (
@@ -58,24 +65,7 @@ export const Register = () => {
 						required
 					/>
 				</div>
-				<div className='mb-4'>
-					<label
-						className='block text-sm font-medium text-gray-700'
-						htmlFor='subscriptionLevel'
-					>
-						Prenumeration
-					</label>
-					<select
-						id='subscriptionLevel'
-						value={subscriptionLevel}
-						onChange={(e) => setSubscriptionLevel(e.target.value)}
-						className='text-black mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-					>
-						<option value='basic'>Fiskekort</option>
-						<option value='plus'>Fiskeguide</option>
-						<option value='full'>Mästerfiskare</option>
-					</select>
-				</div>
+
 				<button
 					type='submit'
 					className='w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition duration-200'
