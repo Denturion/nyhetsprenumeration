@@ -2,7 +2,7 @@ export interface User {
 	id: number;
 	email: string;
 	password_hash: string;
-	subscriptionLevel: 'basic' | 'plus' | 'full';
+	subscriptionLevel: 'free' | 'basic' | 'plus' | 'full';
 	subscriptionExpiresAt: Date | null;
 	isActive: boolean;
 	createdAt: Date;
@@ -11,7 +11,7 @@ export interface User {
 export interface RegisterRequest {
 	email: string;
 	password: string;
-	subscriptionLevel?: 'basic' | 'plus' | 'full';
+	subscriptionLevel?: 'free' | 'basic' | 'plus' | 'full';
 }
 
 export interface LoginRequest {
@@ -20,5 +20,5 @@ export interface LoginRequest {
 }
 
 export interface UpdateSubscriptionRequest {
-	subscriptionLevel: 'basic' | 'plus' | 'full';
+	subscriptionLevel: 'free' | 'basic' | 'plus' | 'full';
 }
