@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useArticle } from '../hooks/useArticle';
+
+import { DashboardArticles } from '../components/DashboardArticles';
 
 export const Dashboard = () => {
 	const navigate = useNavigate();
@@ -7,6 +10,7 @@ export const Dashboard = () => {
 		email?: String;
 		subscriptionLevel?: string;
 	} | null>(null);
+	const { articles, isloading, getallArticles } = useArticle();
 
 	useEffect(() => {
 		const token = sessionStorage.getItem('token');
@@ -16,6 +20,12 @@ export const Dashboard = () => {
 		}
 	}, []);
 
+	useEffect(() => {
+		if (user?.subscriptionLevel) {
+			getallArticles(1, user.subscriptionLevel);
+		}
+	}, [user]);
+
 	return (
 		<div className='flex flex-col items-center justify-center h-screen'>
 			{user ? (
@@ -23,6 +33,23 @@ export const Dashboard = () => {
 					<h1 className='text-4xl font-bold mb-4'>Dashboard</h1>
 					<p className='text-lg'>Välkommen, {user.email}!</p>
 					<p>Prenumeration: {user.subscriptionLevel}</p>
+					<DashboardArticles
+						articles={articles}
+						userLevel={user.subscriptionLevel || 'free'}
+						isLoading={isloading}
+					/>
+
+					<button
+						type='button'
+						onClick={() => {
+							sessionStorage.removeItem('token');
+							setUser(null);
+							navigate('/login');
+						}}
+						className='mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200'
+					>
+						Logga ut
+					</button>
 				</div>
 			) : (
 				<div>
