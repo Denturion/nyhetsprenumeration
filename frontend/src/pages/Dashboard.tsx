@@ -78,6 +78,8 @@ export const Dashboard = () => {
 						type='button'
 						onClick={() => {
 							sessionStorage.removeItem('token');
+							console.log('Du är utloggad');
+
 							setUser(null);
 							navigate('/');
 						}}
