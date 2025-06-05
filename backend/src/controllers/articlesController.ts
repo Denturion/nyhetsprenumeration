@@ -38,7 +38,6 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
   } else {
     const userIndex = allLevels.indexOf(user.subscriptionLevel);
     allowedLevels = allLevels.slice(0, userIndex + 1);
-    console.log("Admin - allowed levels:", allowedLevels);
   }
 
   if (search) {

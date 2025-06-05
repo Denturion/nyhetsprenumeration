@@ -159,3 +159,4 @@ export const cancelSubscription = async (
     res.status(500).json({ message: "Kunde inte ta bort prenumeration" });
   }
 };
+

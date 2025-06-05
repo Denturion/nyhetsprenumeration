@@ -5,7 +5,6 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { SingleArticlePage } from './pages/SingleArticlePage';
 import { Subscriptions } from './pages/Subscriptions';
-import { MySubscriptions } from './pages/MySubscriptions';
 import { SuccessPage } from './pages/SuccessPage';
 import { AdminArticlepage } from './pages/AdminArticlepage';
 import { Testpage } from './pages/testpage';
@@ -46,10 +45,6 @@ export const router = createBrowserRouter([
 			{
 				path: '/subscriptions',
 				element: <Subscriptions />,
-			},
-			{
-				path: '/my-subscriptions',
-				element: <MySubscriptions />,
 			},
 			{
 				path: '/success',
