@@ -27,7 +27,13 @@ export const ArticleList = ({
 				>
 					<div className='flex flex-col md:flex-row md:justify-between md:items-center gap-2'>
 						<div>
-							<Link to={`/article/${article.id}`}><strong className='text-blue-400'>{article.title}</strong></Link> – nivå:{' '}
+							<Link
+								to={`/article/${article.id}`}
+								className='text-blue-400 hover:underline font-semibold'
+							>
+								<strong>{article.title}</strong>
+							</Link>{' '}
+							– nivå:{' '}
 							<span className='text-gray-300'>
 								{levelNames[article.levelRequired]}
 							</span>

@@ -36,6 +36,7 @@ export const getArticles = async (
 		let articles: any[];
 		let totalItems = 0;
 
+
 		if (isAdmin) {
 			const getArticlesQuery = `
             SELECT * FROM Huggtid.Article
@@ -92,6 +93,7 @@ export const getArticles = async (
 				.map(() => '?')
 				.join(',')}) ${search ? 'AND title LIKE ?' : ''}`;
 			const lockedQuery = `
+
     SELECT * FROM Huggtid.Article
     ${lockedWhere}
     ORDER BY \`createdAt\` DESC

@@ -6,6 +6,9 @@ export interface RegisterRequest {
 	subscriptionLevel?: SubscriptionLevel;
 }
 
+export type RegisterOrToken = Pick<RegisterRequest, "email" | "subscriptionLevel">
+
+
 export interface LoginRequest {
 	email: string;
 	password: string;

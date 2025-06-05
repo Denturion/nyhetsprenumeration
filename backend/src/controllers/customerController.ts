@@ -124,37 +124,40 @@ export const cancelSubscription = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
-	const token = req.headers.authorization?.split(' ')[1];
-	if (!token) {
-		res.status(401).json({ message: 'Ingen token hittades' });
-		return;
-	}
 
-	try {
-		const decoded = jwt.verify(
-			token,
-			process.env.JWT_SECRET || 'secret'
-		) as any;
-		const userId = decoded.id;
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    res.status(401).json({ message: "Ingen token hittades" });
+    return;
+  }
 
-		const [rows] = await db.query(
-			'SELECT stripeSubscriptionId FROM User WHERE id = ?',
-			[userId]
-		);
-		const subscriptionId = (rows as any)[0]?.stripeSubscriptionId;
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "secret"
+    ) as any;
+    const userId = decoded.id;
 
-		if (subscriptionId) {
-			await stripe.subscriptions.update(subscriptionId, {
-				cancel_at_period_end: true,
-			});
-		}
+    const [rows] = await db.query(
+      "SELECT stripeSubscriptionId FROM User WHERE id = ?",
+      [userId]
+    );
+    const subscriptionId = (rows as any)[0]?.stripeSubscriptionId;
 
-		res.json({
-			message:
-				'Prenumerationen avslutas i slutet av perioden. Du behåller tillgång tills dess.',
-		});
-	} catch (err) {
-		console.error('Cancel subscription error:', err);
-		res.status(500).json({ message: 'Kunde inte ta bort prenumeration' });
-	}
+    if (subscriptionId) {
+      await stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: true,
+      });
+    }
+
+    res.json({
+      message:
+        "Prenumerationen avslutas i slutet av perioden. Du behåller tillgång tills dess.",
+    });
+  } catch (err) {
+    console.error("Cancel subscription error:", err);
+    res.status(500).json({ message: "Kunde inte ta bort prenumeration" });
+  }
 };
+
+
