@@ -15,7 +15,7 @@ export const SuccessPage = () => {
 
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}stripe/session/${sessionId}`
+          `${import.meta.env.VITE_BACKEND_URL}/stripe/session/${sessionId}`
         );
         setEmail(res.data.customer_email);
       } catch (err) {

@@ -7,6 +7,11 @@ import {
   RegisterRequest,
   UpdateSubscriptionRequest,
 } from "../models/CustomerInterfaces";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2025-05-28.basil",
+});
 
 // User registration
 
@@ -40,7 +45,6 @@ export const userRegister = async (
 
     res.status(500).json({ message: "Registration failed", error });
   }
-
 };
 
 //User login
@@ -49,7 +53,6 @@ export const userLogin = async (
   req: Request<{}, {}, LoginRequest>,
   res: Response
 ): Promise<void> => {
-
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -87,7 +90,6 @@ export const userLogin = async (
   } catch (error) {
     res.status(500).json({ message: "Login failed", error });
   }
-
 };
 
 // Update subscriptionLevel
@@ -123,24 +125,34 @@ export const cancelSubscription = async (
   res: Response
 ): Promise<void> => {
   const token = req.headers.authorization?.split(" ")[1];
-
   if (!token) {
     res.status(401).json({ message: "Ingen token hittades" });
-    return; 
+    return;
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as any;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "secret"
+    ) as any;
     const userId = decoded.id;
 
-    await db.query(
-      `UPDATE User
-       SET subscriptionLevel = 'free', subscriptionExpiresAt = NULL, isActive = 0
-       WHERE id = ?`,
+    const [rows] = await db.query(
+      "SELECT stripeSubscriptionId FROM User WHERE id = ?",
       [userId]
     );
+    const subscriptionId = (rows as any)[0]?.stripeSubscriptionId;
 
-    res.json({ message: "Prenumeration avslutad" });
+    if (subscriptionId) {
+      await stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: true,
+      });
+    }
+
+    res.json({
+      message:
+        "Prenumerationen avslutas i slutet av perioden. Du behåller tillgång tills dess.",
+    });
   } catch (err) {
     console.error("Cancel subscription error:", err);
     res.status(500).json({ message: "Kunde inte ta bort prenumeration" });
