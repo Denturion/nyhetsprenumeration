@@ -3,4 +3,5 @@ export interface TokenPayload {
   email: string;
   subscriptionLevel: 'free' | 'basic' | 'plus' | 'full';
   role: 'user' | 'admin';
+  subscriptionExpiresAt: Date;
 }
