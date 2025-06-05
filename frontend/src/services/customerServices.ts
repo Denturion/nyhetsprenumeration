@@ -11,7 +11,7 @@ export async function register(
 	subscriptionLevel: string
 ): Promise<{ message: string }> {
 	console.log(`${API_URL}/customers/register`);
-	
+
 	const res = await axios.post(`${API_URL}/customers/register`, {
 		email,
 		password,
@@ -42,6 +42,23 @@ export async function updateSubscriptionLevel(
 	const res = await axios.put(
 		`${API_URL}/customers/subscription`,
 		{ subscriptionLevel },
+		{
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}
+	);
+	return res.data;
+}
+
+//Cancel subscription
+
+export async function cancelSubscription(
+	token: string
+): Promise<{ message: string }> {
+	const res = await axios.post(
+		`${API_URL}/customers/cancel-subscription`,
+		{},
 		{
 			headers: {
 				Authorization: `Bearer ${token}`,

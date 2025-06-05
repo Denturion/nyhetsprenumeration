@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useArticle } from '../hooks/useArticle';
 
 import { DashboardArticles } from '../components/DashboardArticles';
+import { cancelSubscription } from '../services/customerServices';
 
 export const Dashboard = () => {
 	const navigate = useNavigate();
@@ -11,7 +12,7 @@ export const Dashboard = () => {
 		subscriptionLevel?: string;
 		subscriptionExpiresAt?: string;
 	} | null>(null);
-	const { articles, isloading, getallArticles } = useArticle();
+	const { articles, isloading } = useArticle();
 
 	useEffect(() => {
 		const token = sessionStorage.getItem('token');
@@ -29,13 +30,7 @@ export const Dashboard = () => {
 		}
 
 		try {
-			await fetch('http://localhost:5000/customers/cancel-subscription', {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-
+			await cancelSubscription(token);
 			setUser((prev) =>
 				prev
 					? {
@@ -45,7 +40,6 @@ export const Dashboard = () => {
 					  }
 					: null
 			);
-
 			alert('Prenumerationen har avslutats.');
 		} catch (error) {
 			console.error('Kunde inte avsluta prenumeration:', error);
@@ -73,6 +67,23 @@ export const Dashboard = () => {
 						className='mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition'
 					>
 						Ta bort prenumeration
+					</button>
+					<DashboardArticles
+						articles={articles}
+						userLevel={user.subscriptionLevel || 'free'}
+						isLoading={isloading}
+					/>
+
+					<button
+						type='button'
+						onClick={() => {
+							sessionStorage.removeItem('token');
+							setUser(null);
+							navigate('/');
+						}}
+						className='mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200'
+					>
+						Logga ut
 					</button>
 				</div>
 			) : (
