@@ -50,6 +50,7 @@ export const handleStripeWebhook = async (
         "SELECT * FROM User WHERE email = ?",
         [customerEmail]
       );
+
       if (userRows.length === 0) {
         console.error("User not found for email:", customerEmail);
         res.status(400).json({ error: "User not found" });
@@ -66,17 +67,13 @@ export const handleStripeWebhook = async (
         [newLevel, expiresAt, user.id]
       );
 
+      const stripeStatus = session.status === "complete" ? "succeeded" : "failed";
+
       await db.query(
         `INSERT INTO Payment (userId, stripePaymentId, status) 
-         VALUES (?, ?, 'succeeded')`,
-        [user.id, paymentIntentId]
+         VALUES (?, ?, ?)`,
+        [user.id, paymentIntentId, stripeStatus]
       );
-
-      console.log("User and payment updated:", {
-        email: customerEmail,
-        newLevel,
-        expiresAt,
-      });
     }
 
     res.status(200).json({ received: true });
@@ -90,3 +87,4 @@ export const handleStripeWebhook = async (
     }
   }
 };
+
