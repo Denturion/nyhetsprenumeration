@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { ArticleData } from '../models/ArticleOutput';
 
 interface ArticleListProps {
@@ -26,7 +27,13 @@ export const ArticleList = ({
 				>
 					<div className='flex flex-col md:flex-row md:justify-between md:items-center gap-2'>
 						<div>
-							<strong className='text-blue-400'>{article.title}</strong> – nivå:{' '}
+							<Link
+								to={`/article/${article.id}`}
+								className='text-blue-400 hover:underline font-semibold'
+							>
+								<strong>{article.title}</strong>
+							</Link>{' '}
+							– nivå:{' '}
 							<span className='text-gray-300'>
 								{levelNames[article.levelRequired]}
 							</span>
