@@ -86,15 +86,15 @@ export const AdminArticlepage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-white text-center">
-        Admin – Artiklar
-      </h1>
+    <div className="bg-gray-900 text-gray-100 px-4 py-6 w-full max-w-7xl mx-auto">
 
       <form
         onSubmit={handleSubmit}
         className="bg-gray-800 shadow-md p-6 rounded-lg mb-6 space-y-4"
       >
+      <h1 className="text-2xl font-bold mb-6 text-white text-center">
+        Admin – Artiklar
+      </h1>
         <div>
           <label className="block mb-1 font-medium text-gray-200">Titel</label>
           <input

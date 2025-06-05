@@ -21,7 +21,7 @@ export const Login = () => {
 	};
 
 	return (
-		<div className='flex flex-col items-center justify-center h-screen bg-gray-900'>
+		<div className='flex flex-col items-center justify-center flex-grow bg-gray-900'>
 			<h1 className='text-4xl font-bold mb-4 text-white'>Login Page</h1>
 			<form
 				onSubmit={handleSubmit}
