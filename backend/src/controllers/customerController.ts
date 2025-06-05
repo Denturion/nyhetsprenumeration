@@ -19,6 +19,7 @@ export const userRegister = async (
   req: Request<{}, {}, RegisterRequest>,
   res: Response
 ): Promise<void> => {
+
   const { email, password, subscriptionLevel } = req.body;
   if (!email || !password) {
     res.status(400).json({ message: "Email and password required" });
