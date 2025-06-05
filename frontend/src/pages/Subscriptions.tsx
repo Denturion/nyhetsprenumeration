@@ -2,9 +2,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import type { IPlan } from "../interfaces/IPlan";
 
+import type { RegisterOrToken } from "../models/CustomerModels";
+
 export const Subscriptions = () => {
   const [plans, setPlans] = useState<IPlan[]>([]);
+  const [user, setUser] = useState<RegisterOrToken | null>(null);
 
+  console.log(user);
+  
   useEffect(() => {
     const fetchPlans = async () => {
       try {
@@ -21,15 +26,48 @@ export const Subscriptions = () => {
     fetchPlans();
   }, []);
 
-  const handleSubscribe = async (priceId: string) => {
-    const registration = sessionStorage.getItem("registration");
 
+  // Kollar användare i token och i registration så vi kan återanvända 
+  // och upgradera prem med samma komponent.
+  useEffect(() => {
+  const token = sessionStorage.getItem("token");
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      setUser(payload);
+    } catch (e) {
+      console.error("Fel vid tolkning av token:", e);
+      setUser(null);
+    }
+  } else {
+    const registration = sessionStorage.getItem("registration");
+    if (registration) {
+      try {
+        const regUser = JSON.parse(registration);
+        setUser(regUser);
+      } catch (e) {
+        console.error("Fel vid tolkning av registration:", e);
+        setUser(null);
+      }
+    } else {
+      setUser(null);
+    }
+  }
+}, []);
+
+  const handleSubscribe = async (priceId: string) => {
+
+   const registration = {
+                email: user?.email,
+                subscriptionLevel: user?.subscriptionLevel
+      }           
+    
     if (!registration) {
       console.error("Ingen registrering hittades i sessionStorage");
       return;
     }
 
-    const { email } = JSON.parse(registration);
+    const { email } = registration;
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/stripe/create-session`,
