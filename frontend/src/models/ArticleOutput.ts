@@ -12,9 +12,10 @@ export interface ArticleData {
   content: string;
   levelRequired: string;
   createdAt: string;
+  image?:string
 }
 
-export type FormType = Pick<ArticleData, "title" | "content" | "levelRequired">;
+export type FormType = Pick<ArticleData, "title" | "content" | "levelRequired" | "image">;
 
 export interface CreateArticleMesage {
   message: string;

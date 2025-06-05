@@ -8,12 +8,14 @@ export const SuccessPage = () => {
   const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
+    sessionStorage.removeItem("registration");
+
     const fetchSession = async () => {
       if (!sessionId) return;
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/stripe/session/${sessionId}`
+          `${import.meta.env.VITE_BACKEND_URL}/stripe/session/${sessionId}`
         );
         setEmail(res.data.customer_email);
       } catch (err) {
@@ -26,7 +28,7 @@ export const SuccessPage = () => {
 
   return (
     <div className="p-6 text-center">
-      <h1 className="text-2xl font-bold mb-4">Tack för ditt köp!</h1>
+      <h2 className="text-2xl font-bold mb-4">Tack för ditt köp!</h2>
       {email ? (
         <p>
           En bekräftelse har skickats till <strong>{email}</strong>.
@@ -34,6 +36,7 @@ export const SuccessPage = () => {
       ) : (
         <p>Behandlar din beställning...</p>
       )}
+      <a href="/login">Klicka här för att logga in!</a>
     </div>
   );
 };
