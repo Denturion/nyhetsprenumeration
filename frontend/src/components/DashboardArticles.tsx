@@ -1,40 +1,66 @@
-import type { ArticleData } from '../models/ArticleOutput';
+import { useNavigate } from 'react-router-dom';
 import { ArticleList } from './ArticleList';
+import type { ArticleData } from '../models/ArticleOutput';
 
 interface DashboardArticlesProps {
 	articles: ArticleData[];
+	lockedArticles: ArticleData[];
 	userLevel: string;
 	isLoading: boolean;
+	searchQuery: string;
+	setSearchQuery: (s: string) => void;
+	showAccessibleOnly: boolean;
 }
 
 const levelOrder = ['free', 'basic', 'plus', 'full'];
 
 export const DashboardArticles = ({
 	articles,
+	lockedArticles,
 	userLevel,
 	isLoading,
+	searchQuery,
 }: DashboardArticlesProps) => {
+	const navigate = useNavigate();
 	const userLevelIndex = levelOrder.indexOf(userLevel);
 
-	const accessibleArticles = articles.filter(
-		(article) => levelOrder.indexOf(article.levelRequired) <= userLevelIndex
+	const filteredAccessible = articles.filter(
+		(a) =>
+			levelOrder.indexOf(a.levelRequired) <= userLevelIndex &&
+			a.title.toLowerCase().includes(searchQuery.toLowerCase())
 	);
-	const lockedArticles = articles.filter(
-		(article) => levelOrder.indexOf(article.levelRequired) > userLevelIndex
+
+	const filteredLocked = lockedArticles.filter((a) =>
+		a.title.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
 	if (isLoading) return <p>Laddar artiklar...</p>;
 
 	return (
 		<>
-			<h2 className='text-2xl font-bold mb-2'>Dina artiklar</h2>
-			<ArticleList articles={accessibleArticles} />
-			{lockedArticles.length > 0 && (
+			<ArticleList articles={filteredAccessible} />
+			{filteredLocked.length > 0 && (
 				<>
 					<h2 className='text-2xl font-bold mt-8 mb-2'>
 						Lås upp fler artiklar med högre prenumeration
 					</h2>
-					<ArticleList articles={lockedArticles} />
+					<ul className='space-y-2'>
+						{filteredLocked.map((article) => (
+							<li
+								key={article.id}
+								className='border-b border-gray-700 py-3 px-4 rounded bg-gray-400 opacity-60 cursor-pointer'
+								onClick={() => navigate('/subscriptions')}
+								tabIndex={0}
+								style={{ pointerEvents: 'auto' }}
+								title='Klicka för att uppgradera din prenumeration'
+							>
+								<div>
+									<strong className='text-blue-400'>{article.title}</strong>
+									<span className='ml-2 text-sm text-gray-700'>(Lås upp)</span>
+								</div>
+							</li>
+						))}
+					</ul>
 				</>
 			)}
 		</>
