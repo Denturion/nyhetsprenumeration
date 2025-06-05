@@ -1,6 +1,7 @@
 /// <reference path="../types/express.d.ts" />
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { TokenPayload } from '../models/Token';
 
 export const authenticateJWT = (
 	req: Request,
@@ -18,7 +19,7 @@ export const authenticateJWT = (
 
 	try {
 		const secret = process.env.JWT_SECRET || 'secret';
-		const decoded = jwt.verify(token, secret);
+		const decoded = jwt.verify(token, secret) as TokenPayload;
 		req.user = decoded;
 		next();
 	} catch (error) {

@@ -1,8 +1,6 @@
 import type { ArticleData, Articlepagination, CreateArticleMesage, FormType, UpdateArticleMessage } from "../models/ArticleOutput";
 import { deleteData, getData, patchData, postData } from "./baseservice";
 
-const BASE_URL = "http://localhost:5000";
-
 const handleRequest = async <T>(request: Promise<T>): Promise<T> => {
   try {
     return await request;
@@ -15,7 +13,7 @@ const handleRequest = async <T>(request: Promise<T>): Promise<T> => {
 
 export const getAllArticles = async (page:number,query?:string,searchquery?:string):Promise<Articlepagination> => {
 
-   let url = `${BASE_URL}/articles?page=${page}&limit=8`;
+   let url = `/articles?page=${page}&limit=8`;
 
   if (query) {
     url += `&level=${query}`;
@@ -27,16 +25,16 @@ export const getAllArticles = async (page:number,query?:string,searchquery?:stri
 }
 
 export const getArticleById = async (id:number):Promise<ArticleData> => {
-    return handleRequest(getData(`${BASE_URL}/articles/${id}`));
+    return handleRequest(getData(`/articles/${id}`));
 }
 
 export const updateArticleById = async (id:number,payload:FormType):Promise<UpdateArticleMessage> => {
-    return handleRequest(patchData(`${BASE_URL}/articles/${id}`,payload));
+    return handleRequest(patchData(`/articles/${id}`,payload));
 }
 
 export const deleteArticleById = async (id:number):Promise<string> => {
-    return handleRequest(deleteData(`${BASE_URL}/articles/${id}`));
+    return handleRequest(deleteData(`/articles/${id}`));
 }
 export const createArticle = async (payload:ArticleData):Promise<CreateArticleMesage> => {
-    return handleRequest(postData(`${BASE_URL}/articles`, payload));
+    return handleRequest(postData(`/articles`, payload));
 }

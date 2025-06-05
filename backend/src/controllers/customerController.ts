@@ -14,6 +14,7 @@ export const userRegister = async (
   req: Request<{}, {}, RegisterRequest>,
   res: Response
 ): Promise<void> => {
+
   const { email, password, subscriptionLevel } = req.body;
   if (!email || !password) {
     res.status(400).json({ message: "Email and password required" });
@@ -39,6 +40,7 @@ export const userRegister = async (
 
     res.status(500).json({ message: "Registration failed", error });
   }
+
 };
 
 //User login
@@ -47,6 +49,7 @@ export const userLogin = async (
   req: Request<{}, {}, LoginRequest>,
   res: Response
 ): Promise<void> => {
+
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -84,6 +87,7 @@ export const userLogin = async (
   } catch (error) {
     res.status(500).json({ message: "Login failed", error });
   }
+
 };
 
 // Update subscriptionLevel

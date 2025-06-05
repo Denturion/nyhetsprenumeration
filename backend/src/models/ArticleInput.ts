@@ -4,4 +4,5 @@ export interface ArticleInput {
   content: string;
   levelRequired: "basic" | "plus" | "full";
   createdAt?:string
+  image?:string
 }
