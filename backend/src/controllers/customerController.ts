@@ -75,11 +75,12 @@ export const userLogin = async (
       res.status(401).json({ message: "Invalid credentials" });
       return;
     }
-
+   
     const token = jwt.sign(
       {
         id: user.id,
         email: user.email,
+        role: user.role,
         subscriptionLevel: user.subscriptionLevel,
         subscriptionExpiresAt: user.subscriptionExpiresAt,
       },

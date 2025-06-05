@@ -4,15 +4,10 @@ import { toError } from '../utility/error';
 import { ArticleInput } from '../models/ArticleInput';
 import { ArticleParamas } from '../models/ArticleParams';
 import { ResultSetHeader } from 'mysql2';
-import { log } from 'console';
 
 
 export const getArticles = async (req: Request, res: Response): Promise<void> => {
-   const user = req.user; 
-/*   const user =  {
-    role: req.user,              // "admin" eller "user"
-    subscriptionLevel: "basic"   // "basic", "plus" eller "full"
-  }; */
+   const user = req.user;    
 
   if (!user) {
   res.status(401).json({ message: "Inte inloggad" });
@@ -33,7 +28,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
   let allowedLevels: string[] = [];
 
   if (isAdmin) {
-    const requestedLevel = req.query.level as string;
+    const requestedLevel = (req.query.level as string)?.trim();
 
     if (requestedLevel && allLevels.includes(requestedLevel)) {
       allowedLevels = [requestedLevel]; 
@@ -43,6 +38,7 @@ export const getArticles = async (req: Request, res: Response): Promise<void> =>
   } else {
     const userIndex = allLevels.indexOf(user.subscriptionLevel);
     allowedLevels = allLevels.slice(0, userIndex + 1);
+    console.log("Admin - allowed levels:", allowedLevels);
   }
 
   if (search) {
