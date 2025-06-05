@@ -12,7 +12,10 @@ export const Dashboard = () => {
 		subscriptionLevel?: string;
 		subscriptionExpiresAt?: string;
 	} | null>(null);
-	const { articles, isloading } = useArticle();
+	const [pagenumber, setPagenumber] = useState<number>(1);
+	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [inputValue, setInputValue] = useState<string>("");
+	const { articles, isloading,totalPages,getallArticles } = useArticle();
 
 	useEffect(() => {
 		const token = sessionStorage.getItem('token');
@@ -21,6 +24,26 @@ export const Dashboard = () => {
 			setUser(payload);
 		}
 	}, []);
+
+	 useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearchQuery(inputValue);
+      getallArticles(1, undefined, inputValue);
+    }, 800);
+    return () => clearTimeout(timeout);
+  }, [inputValue]);
+
+	const handlePage = (direction: "prev" | "next") => {
+    if (pagenumber === totalPages && direction === "next") {
+      return;
+    }
+    setPagenumber((prev) => {
+      const nextPage = direction === "next" ? prev + 1 : Math.max(1, prev - 1);
+      getallArticles(nextPage,undefined, searchQuery);
+      return nextPage;
+    });
+  };
+
 
 	const handleCancel = async () => {
 		const token = sessionStorage.getItem('token');
@@ -52,6 +75,13 @@ export const Dashboard = () => {
 			{user ? (
 				<div>
 					<h1 className='text-4xl font-bold mb-4'>Dashboard</h1>
+					<input
+              placeholder="Sök på titel"
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="flex-1 bg-gray-700 border border-gray-600 p-2 rounded text-white"
+            />
 					<p className='text-lg'>Välkommen, {user.email}!</p>
 					<p>
 						<strong>Prenumeration: {user.subscriptionLevel}</strong>
@@ -73,7 +103,20 @@ export const Dashboard = () => {
 						userLevel={user.subscriptionLevel || 'free'}
 						isLoading={isloading}
 					/>
-
+					<div>
+						 <button
+              onClick={() => handlePage("prev")}
+              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              Föregående
+            </button>
+            <button
+              onClick={() => handlePage("next")}
+              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              Nästa
+            </button>
+					</div>
 					<button
 						type='button'
 						onClick={() => {
