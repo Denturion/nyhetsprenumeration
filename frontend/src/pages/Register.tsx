@@ -27,15 +27,15 @@ export const Register = () => {
 	};
 
 	return (
-		<div className='flex flex-col items-center justify-center h-screen bg-gray-100'>
-			<h1 className='text-4xl font-bold mb-4'>Skapa konto</h1>
+		<div className='flex flex-col items-center justify-center h-screen bg-gray-900'>
+			<h1 className='text-4xl font-bold mb-4 text-white'>Skapa konto</h1>
 			<form
 				onSubmit={handleSubmit}
-				className='bg-white p-6 rounded shadow-md w-80'
+				className='bg-gray-800 p-6 rounded shadow-md w-80'
 			>
 				<div className='mb-4'>
 					<label
-						className='block text-sm font-medium text-gray-700'
+						className='block text-sm font-medium text-gray-200'
 						htmlFor='email'
 					>
 						Email
@@ -45,13 +45,13 @@ export const Register = () => {
 						id='email'
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
-						className='text-black mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+						className='text-white bg-gray-700 mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500'
 						required
 					/>
 				</div>
 				<div className='mb-4'>
 					<label
-						className='block text-sm font-medium text-gray-700'
+						className='block text-sm font-medium text-gray-200'
 						htmlFor='password'
 					>
 						Lösenord
@@ -61,18 +61,24 @@ export const Register = () => {
 						id='password'
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-						className='text-black mt-1 block w-full px-3 py-2 border border-black-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500'
+						className='text-white bg-gray-700 mt-1 block w-full px-3 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500'
 						required
 					/>
 				</div>
-
 				<button
 					type='submit'
 					className='w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition duration-200'
 				>
 					Gå till betalning
 				</button>
-				{message && <p className='mt-4 text-center text-red-600'>{message}</p>}
+				{message && <p className='mt-4 text-center text-red-400'>{message}</p>}
+				<button
+					type='button'
+					onClick={() => navigate('/login')}
+					className='mt-4 w-full text-blue-400 hover:underline'
+				>
+					Har du redan ett konto? Logga in här.
+				</button>
 			</form>
 		</div>
 	);

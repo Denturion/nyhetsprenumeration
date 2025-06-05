@@ -46,6 +46,7 @@ export const router = createBrowserRouter([
 				path: '/subscriptions',
 				element: <Subscriptions />,
 			},
+
 			{
 				path: '/success',
 				element: <SuccessPage />,
