@@ -10,6 +10,7 @@ import { SuccessPage } from './pages/SuccessPage';
 import { AdminArticlepage } from './pages/AdminArticlepage';
 import { Testpage } from './pages/testpage';
 import { Register } from './pages/Register';
+import { userLoader } from './utils/userLoader';
 
 export const router = createBrowserRouter([
 	{
@@ -22,15 +23,17 @@ export const router = createBrowserRouter([
 			},
 			{
 				path: '/test',
-				element: <Testpage/>,
+				element: <Testpage />,
 			},
 			{
 				path: '/login',
 				element: <Login />,
+				loader: userLoader,
 			},
 			{
 				path: '/register',
 				element: <Register />,
+				loader: userLoader,
 			},
 			{
 				path: '/dashboard',
@@ -52,7 +55,6 @@ export const router = createBrowserRouter([
 				path: '/success',
 				element: <SuccessPage />,
 			},
-			
 		],
 	},
 	{
@@ -62,8 +64,7 @@ export const router = createBrowserRouter([
 			{
 				path: 'article',
 				element: <AdminArticlepage />,
-			}
-			
+			},
 		],
 	},
 ]);

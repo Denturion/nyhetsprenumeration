@@ -44,7 +44,7 @@ export const Dashboard = () => {
 						onClick={() => {
 							sessionStorage.removeItem('token');
 							setUser(null);
-							navigate('/login');
+							navigate('/');
 						}}
 						className='mt-4 bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200'
 					>
