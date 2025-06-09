@@ -122,6 +122,39 @@ export const handleStripeWebhook = async (
         break;
       }
 
+      case "invoice.payment_failed": {
+        const invoice = data as any;
+
+        const stripeSubId = invoice.subscription as string;
+        const paymentIntentId = invoice.payment_intent as string;
+
+        if (!stripeSubId || !paymentIntentId) {
+          console.warn("Missing subscription or payment intent ID in invoice.");
+          break;
+        }
+
+        const [userRows] = await db.query<IUser[]>(
+          "SELECT id FROM User WHERE stripeSubscriptionId = ?",
+          [stripeSubId]
+        );
+
+        if (userRows.length === 0) {
+          console.warn("No user found for failed subscription:", stripeSubId);
+          break;
+        }
+
+        const user = userRows[0];
+
+        await db.query(
+          `INSERT INTO Payment (userId, stripePaymentId, status)
+     VALUES (?, ?, ?)`,
+          [user.id, paymentIntentId, "failed"]
+        );
+
+        console.warn("Payment failure recorded for user:", user.id);
+        break;
+      }
+
       default:
         console.log(`Event type '${eventType}' not handled.`);
         break;
