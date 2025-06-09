@@ -8,7 +8,6 @@ import {
 	UpdateSubscriptionRequest,
 } from '../models/CustomerInterfaces';
 import Stripe from 'stripe';
-import { log } from 'console';
 import { RowDataPacket } from 'mysql2';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -172,7 +171,7 @@ export const cancelSubscription = async (
   }
 };
 
-///////////////////////////
+
 
 export const getSubscriptionStatus = async (
   req: Request,
