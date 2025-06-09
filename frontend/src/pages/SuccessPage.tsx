@@ -1,15 +1,27 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 export const SuccessPage = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState<string | null>(null);
   const sessionId = searchParams.get("session_id");
+  const navigate = useNavigate()
 
   useEffect(() => {
-    sessionStorage.removeItem("registration");
+      const hasReloaded = sessionStorage.getItem("hasReloadedAfterSuccess");
 
+  if (!hasReloaded) {
+    sessionStorage.removeItem("registration");
+    sessionStorage.removeItem("token");
+
+    // Flagga att vi redan laddat om
+    sessionStorage.setItem("hasReloadedAfterSuccess", "true");
+
+    // Ladda om EN gång
+    location.reload();
+    return;
+  }
     const fetchSession = async () => {
       if (!sessionId) return;
 

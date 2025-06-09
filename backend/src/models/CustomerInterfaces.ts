@@ -6,6 +6,7 @@ export interface User {
 	subscriptionExpiresAt: Date | null;
 	isActive: boolean;
 	createdAt: Date;
+	subscriptionCanceled:boolean;
 }
 
 export interface RegisterRequest {

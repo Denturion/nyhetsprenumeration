@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useArticle } from "../hooks/useArticle";
 import { DashboardArticles } from "../components/DashboardArticles";
-import { cancelSubscription } from "../services/customerServices";
+import {
+  cancelSubscription,
+  checkSubscriptionStatus,
+} from "../services/customerServices";
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,9 +14,10 @@ export const Dashboard = () => {
     subscriptionLevel?: string;
     subscriptionExpiresAt?: string;
   } | null>(null);
-
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [subCanceld, setSubCanceld] = useState<boolean>(false);
   const { articles, lockedArticles, isloading, totalPages, getallArticles } =
     useArticle();
 
@@ -23,6 +27,14 @@ export const Dashboard = () => {
     plus: "Fiskeguide",
     full: "Mästerfiskare",
   };
+
+  useEffect(() => {
+    const CheckStatus = async () => {
+      const status = await checkSubscriptionStatus();
+      setSubCanceld(status);
+    };
+    CheckStatus();
+  }, []);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -38,6 +50,10 @@ export const Dashboard = () => {
     getallArticles(pageNumber, user?.subscriptionLevel, searchQuery);
   }, [pageNumber, searchQuery, user]);
 
+  const handleSubscription = () => {
+    navigate("/subscriptions");
+  };
+
   const handleCancel = async () => {
     const token = sessionStorage.getItem("token");
     if (!token) {
@@ -45,17 +61,18 @@ export const Dashboard = () => {
       return;
     }
     try {
-      await cancelSubscription(token);
+      const response = await cancelSubscription(token);
+
+      setSubCanceld(true);
       setUser((prev) =>
         prev
           ? {
               ...prev,
-              subscriptionLevel: "free",
-              subscriptionExpiresAt: undefined,
+              subscriptionLevel: prev.subscriptionLevel,
+              subscriptionExpiresAt: response.subscriptionExpiresAt,
             }
           : null
       );
-      alert("Prenumerationen har avslutats.");
     } catch (error) {
       console.error("Kunde inte avsluta prenumeration:", error);
       alert("Något gick fel.");
@@ -64,6 +81,33 @@ export const Dashboard = () => {
 
   return (
     <div className="flex flex-col items-center flex-grow bg-gray-900">
+      {showConfirmCancel && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+              Är du säker på att du vill avsluta din prenumeration?
+            </h2>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setShowConfirmCancel(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+              >
+                Avbryt
+              </button>
+              <button
+                onClick={async () => {
+                  setShowConfirmCancel(false);
+                  await handleCancel();
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Bekräfta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {user ? (
         <div className="w-full max-w-6xl px-4 py-8">
           <h1 className="text-5xl font-bold mb-8 text-white text-center">
@@ -85,12 +129,21 @@ export const Dashboard = () => {
                     )
                   : "okänt"}
               </p>
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              >
-                Ta bort prenumeration
-              </button>
+              {!subCanceld ? (
+                <button
+                  onClick={() => setShowConfirmCancel(true)}
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                >
+                  Ta bort prenumeration
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubscription}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                >
+                  prenumera
+                </button>
+              )}
             </div>
             <button
               type="button"
