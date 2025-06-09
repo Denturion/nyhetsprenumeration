@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { AuthResponse } from '../models/CustomerModels';
+import { getData } from './baseservice';
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -55,7 +56,9 @@ export async function updateSubscriptionLevel(
 
 export async function cancelSubscription(
 	token: string
-): Promise<{ message: string }> {
+): Promise<{ message: string ,
+			subscriptionExpiresAt?: string
+}> {
 	const res = await axios.post(
 		`${API_URL}/customers/cancel-subscription`,
 		{},
@@ -66,4 +69,9 @@ export async function cancelSubscription(
 		}
 	);
 	return res.data;
+}
+
+export const checkSubscriptionStatus = async (): Promise<boolean> => {
+  const response = await getData<{ subscriptionCanceled: boolean }>("/customers/subscription-status");
+  return response.subscriptionCanceled;
 }

@@ -1,6 +1,7 @@
 import express from 'express';
 import {
 	cancelSubscription,
+	getSubscriptionStatus,
 	updateSubscriptionLevel,
 	userLogin,
 	userRegister,
@@ -14,5 +15,6 @@ router.post('/login', userLogin);
 router.post('/cancel-subscription', cancelSubscription);
 
 router.put('/subscription', authenticateJWT, updateSubscriptionLevel);
+router.get('/subscription-status', authenticateJWT, getSubscriptionStatus);
 
 export default router;

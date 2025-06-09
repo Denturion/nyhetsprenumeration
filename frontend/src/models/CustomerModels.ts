@@ -21,6 +21,7 @@ export interface User {
 	subscriptionExpiresAt?: string | null;
 	isActive: boolean;
 	createdAt: string;
+	subscriptionCanceled:boolean;
 }
 
 export interface AuthResponse {

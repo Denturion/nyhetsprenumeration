@@ -8,6 +8,8 @@ import {
 	UpdateSubscriptionRequest,
 } from '../models/CustomerInterfaces';
 import Stripe from 'stripe';
+import { log } from 'console';
+import { RowDataPacket } from 'mysql2';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 	apiVersion: '2025-05-28.basil',
@@ -139,20 +141,30 @@ export const cancelSubscription = async (
     const userId = decoded.id;
 
     const [rows] = await db.query(
-      "SELECT stripeSubscriptionId FROM User WHERE id = ?",
-      [userId]
-    );
-    const subscriptionId = (rows as any)[0]?.stripeSubscriptionId;
+  "SELECT stripeSubscriptionId, subscriptionExpiresAt FROM User WHERE id = ?",
+  [userId]
+);
+
+	
+	const user = (rows as any)[0];
+	const subscriptionId = user?.stripeSubscriptionId;
+	const subscriptionExpiresAt = user?.subscriptionExpiresAt;
+
 
     if (subscriptionId) {
       await stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
       });
+	  await db.query(
+  		"UPDATE User SET subscriptionCanceled = ? WHERE id = ?",
+  		[true, userId]
+);
     }
-
+	
     res.json({
       message:
         "Prenumerationen avslutas i slutet av perioden. Du behåller tillgång tills dess.",
+		subscriptionExpiresAt
     });
   } catch (err) {
     console.error("Cancel subscription error:", err);
@@ -160,4 +172,43 @@ export const cancelSubscription = async (
   }
 };
 
+///////////////////////////
+
+export const getSubscriptionStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const token = req.headers.authorization?.split(" ")[1];
+  
+  if (!token) {
+    res.status(401).json({ message: "Ingen token hittades" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret") as any;
+    const userId = decoded.id;
+
+    const [rows] = await db.query<RowDataPacket[]>(
+      `SELECT subscriptionCanceled 
+       FROM User 
+       WHERE id = ?`,
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      res.status(404).json({ message: "Användare hittades inte" });
+      return;
+    }
+
+    const user = rows[0];
+
+    res.json({
+      subscriptionCanceled: !!user.subscriptionCanceled,
+    });
+  } catch (err) {
+    console.error("Kunde inte hämta prenumerationsstatus:", err);
+    res.status(500).json({ message: "Serverfel" });
+  }
+};
 

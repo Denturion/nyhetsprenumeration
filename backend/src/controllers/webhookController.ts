@@ -69,7 +69,7 @@ export const handleStripeWebhook = async (
 
         await db.query(
           `UPDATE User 
-           SET subscriptionLevel = ?, subscriptionExpiresAt = ?, isActive = 1, stripeSubscriptionId = ?
+           SET subscriptionLevel = ?, subscriptionExpiresAt = ?, isActive = 1,subscriptionCanceled = 0, stripeSubscriptionId = ?
            WHERE id = ?`,
           [newLevel, expiresAt, subscription.id, user.id]
         );

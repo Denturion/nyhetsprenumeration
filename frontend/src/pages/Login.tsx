@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/customerServices';
 
@@ -19,6 +19,10 @@ export const Login = () => {
 			setMessage(error.response?.data?.message || 'Inloggning misslyckades');
 		}
 	};
+
+	useEffect(()=>{
+		sessionStorage.removeItem("hasReloadedAfterSuccess")
+	},[])
 
 	return (
 		<div className='flex flex-col items-center justify-center flex-grow bg-gray-900'>
