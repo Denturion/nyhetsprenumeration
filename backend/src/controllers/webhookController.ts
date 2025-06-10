@@ -151,7 +151,15 @@ export const handleStripeWebhook = async (
           [user.id, paymentIntentId, "failed"]
         );
 
-        console.warn("Payment failure recorded for user:", user.id);
+        await db.query(
+          `UPDATE User SET subscriptionCanceled = 1 WHERE id = ?`,
+          [user.id]
+        );
+
+        console.warn(
+          "Payment failure recorded and subscription marked as canceled for user:",
+          user.id
+        );
         break;
       }
 
