@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 export const SuccessPage = () => {
   const [searchParams] = useSearchParams();
   const [email, setEmail] = useState<string | null>(null);
   const sessionId = searchParams.get("session_id");
-  const navigate = useNavigate()
 
   useEffect(() => {
       const hasReloaded = sessionStorage.getItem("hasReloadedAfterSuccess");
