@@ -18,11 +18,8 @@ app.use('/webhook', stripeWebhook);
 app.use(
 
 	cors({
-		origin: [
-			'https://nyhetsprenumeration-dkz7.vercel.app/',
-			'http://localhost:5173',
-		],
-		credentials: true,
+		origin: '*',
+		credentials: true, // ✅ Allows cookies
 	})
 );
 app.use(express.json());
