@@ -6,3 +6,8 @@ export interface ArticleInput {
   createdAt?:string
   image?:string
 }
+
+export type ArticleParamas = {
+  id: string;
+};
+

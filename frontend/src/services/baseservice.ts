@@ -29,7 +29,7 @@ export const postData = async <T> (url:string,payload:any):Promise<T> => {
     window.location.href = "/login"; 
     throw new Error("Ingen token – skickar till login");
   }
-const response = await axios.post<T>(url,payload)
+const response = await api.post<T>(url,payload)
 const data = response.data;
 return data
 }
@@ -39,7 +39,7 @@ export const patchData = async <T> (url:string,payload:any):Promise<T> => {
     window.location.href = "/login"; 
     throw new Error("Ingen token – skickar till login");
   }
-const response = await axios.patch<T>(url,payload)
+const response = await api.patch<T>(url,payload)
 const data = response.data;
 return data
 }
@@ -49,7 +49,7 @@ export const deleteData = async <T> (url:string):Promise<T> => {
     window.location.href = "/login"; 
     throw new Error("Ingen token – skickar till login");
   }
-const response = await axios.delete<T>(url)
+const response = await api.delete<T>(url)
 const data = response.data;
 return data
 }

@@ -16,8 +16,8 @@ export const useArticle = () => {
 	const [totalPages, setTotalPages] = useState(1);
 
 	useEffect(() => {
-		const token = sessionStorage.getItem("token");
-  		if (!token) return; 
+		/* const token = sessionStorage.getItem("token");
+  		if (!token) return; */ 
 		setIsloading(true);
 		getallArticles(1);
 	}, []);
