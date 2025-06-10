@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import { db } from '../config/db';
 import { toError } from '../utility/error';
 import { ArticleInput } from '../models/ArticleInput';
@@ -240,23 +240,24 @@ export const updateArticleById = async (
 	}
 };
 
+export const deleteArticleById = async (
+	req: Request<ArticleParamas, {}, {}>,
+	res: Response
+): Promise<void> => {
+	const id = req.params.id;
 
+	let sql = 'DELETE FROM Huggtid.Article WHERE id = ?';
+	try {
+		const [result] = await db.query(sql, [parseInt(id)]);
 
-export const deleteArticleById: RequestHandler<ArticleParamas> = async (req, res) => {
-  const id = req.params.id;
-
-  const sql = "DELETE FROM Huggtid.Article WHERE id = ?";
-  try {
-    const [result] = await db.query(sql, [parseInt(id)]);
-
-    if ((result as ResultSetHeader).affectedRows === 0) {
-      res.status(404).json({ message: `Couldn't find Article with id = ${id}` });
-    } else {
-      res.status(200).json({ message: `Successfully deleted Article with id = ${id}` });
-    }
-  } catch (error) {
-    throw toError(error);
-  }
+		if ((result as ResultSetHeader).affectedRows === 0) {
+			res.status(200).json(`message: Could't find Article with id = ${id} `);
+		} else {
+			res
+				.status(200)
+				.json(`message: Successful deleted Article with id = ${id} `);
+		}
+	} catch (error) {
+		throw toError(error);
+	}
 };
-
-
