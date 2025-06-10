@@ -27,7 +27,7 @@ export const Register = () => {
 	};
 
 	return (
-		<div className='flex flex-col items-center justify-center h-screen bg-gray-900'>
+		<div className='flex flex-col items-center justify-center flex-grow bg-gray-900'>
 			<h1 className='text-4xl font-bold mb-4 text-white'>Skapa konto</h1>
 			<form
 				onSubmit={handleSubmit}

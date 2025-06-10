@@ -20,13 +20,13 @@ export const Login = () => {
 		}
 	};
 
-	useEffect(()=>{
-		sessionStorage.removeItem("hasReloadedAfterSuccess")
-	},[])
+	useEffect(() => {
+		sessionStorage.removeItem('hasReloadedAfterSuccess');
+	}, []);
 
 	return (
 		<div className='flex flex-col items-center justify-center flex-grow bg-gray-900'>
-			<h1 className='text-4xl font-bold mb-4 text-white'>Login Page</h1>
+			<h1 className='text-4xl font-bold mb-4 text-white'>Logga in</h1>
 			<form
 				onSubmit={handleSubmit}
 				className='bg-gray-800 p-6 rounded shadow-md w-80'
