@@ -18,7 +18,7 @@ app.use('/webhook', stripeWebhook);
 app.use(
 	cors({
 		origin: [
-			'https://nyhetsprenumeration-uczf.vercel.app',
+			'https://nyhetsprenumeration-dkz7.vercel.app/',
 			'http://localhost:5173',
 		],
 		credentials: true,
