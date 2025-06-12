@@ -1,4 +1,4 @@
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { useArticle } from '../hooks/useArticle';
 import { useEffect, useState } from 'react';
 import type { ArticleData } from '../models/ArticleOutput';
@@ -56,12 +56,12 @@ export const SingleArticlePage = () => {
 				</div>
 
 				<p className='text-gray-200 whitespace-pre-line'>{article.content}</p>
-				<a
-					href='http://localhost:5173/dashboard'
+				<Link
+					to='/dashboard'
 					className=' text-blue-400 block mt-2'
 				>
 					Tillbaka till dashboard
-				</a>
+				</Link>
 			</div>
 		</div>
 	);

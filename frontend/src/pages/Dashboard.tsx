@@ -10,10 +10,14 @@ import {
 export const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<{
+    role?:string;
     email?: String;
     subscriptionLevel?: string;
     subscriptionExpiresAt?: string;
   } | null>(null);
+
+  console.log(user?.role);
+  
   const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,7 +44,7 @@ export const Dashboard = () => {
     const token = sessionStorage.getItem("token");
     if (token) {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      setUser(payload);
+      setUser(payload); 
     }
   }, []);
 
@@ -113,34 +117,40 @@ export const Dashboard = () => {
           <h1 className="text-5xl font-bold mb-8 text-white text-center">
             Välkommen, {user.email}!
           </h1>
-          <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+          <div className={`flex flex-col md:flex-row justify-between items-center mb-10 gap-6`} >
             <div className="flex flex-col items-start">
-              <p className="text-white text-lg mb-1">
+              <p className={`text-white text-lg mb-1 ${
+    user?.role === "admin" ? "hidden" : "block"
+  }`}>
                 <strong>
                   Prenumeration:{" "}
                   {subLevelDisplay[user.subscriptionLevel ?? "free"]}
                 </strong>
               </p>
-              <p className="text-white text-lg mb-4">
+              <p className={`text-white text-lg mb-4 ${
+    user?.role === "admin" ? "hidden" : "block"
+  }`}>
                 Prenumeration gäller till:{" "}
                 {user.subscriptionExpiresAt
                   ? new Date(user.subscriptionExpiresAt).toLocaleDateString(
                       "sv-SE"
                     )
-                  : "okänt"}
+                  : "Din premunation har gått ut"}
               </p>
               {!subCanceld ? (
                 <button
                   onClick={() => setShowConfirmCancel(true)}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                  className={`px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition ${
+    user?.role === "admin" ? "hidden" : "block"
+  }`}
                 >
                   Ta bort prenumeration
                 </button>
               ) : (
                 <button
                   onClick={handleSubscription}
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                >
+                  className={`px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition ${
+    user?.role === "admin" ? "hidden" : "block"}`}  >
                   prenumera
                 </button>
               )}
