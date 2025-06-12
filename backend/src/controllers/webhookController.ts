@@ -152,7 +152,7 @@ export const handleStripeWebhook = async (
         );
 
         await db.query(
-          `UPDATE User SET subscriptionCanceled = 1 WHERE id = ?`,
+          `UPDATE User SET subscriptionCanceled = 1, subscriptionLevel = 'free', isActive = 0 WHERE id = ?`,
           [user.id]
         );
 
