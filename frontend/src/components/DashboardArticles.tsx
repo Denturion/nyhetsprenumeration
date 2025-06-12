@@ -48,7 +48,7 @@ export const DashboardArticles = ({
 			<ArticleList articles={filteredAccessible} />
 			{filteredLocked.length > 0 && (
 				<>
-					<h2 className='text-2xl font-bold mt-8 mb-2'>
+					<h2 className='text-1xl font-bold mt-8 mb-2'>
 						Lås upp fler artiklar med högre prenumeration
 					</h2>
 					<ul className='space-y-2'>
