@@ -12,6 +12,13 @@ interface DashboardArticlesProps {
 	showAccessibleOnly: boolean;
 }
 
+const levelNames: Record<string, string> = {
+	basic: 'Fiskepass',
+	plus: 'Fiskeguide',
+	full: 'Mästerfiskare',
+	free: 'Gratis',
+};
+
 const levelOrder = ['free', 'basic', 'plus', 'full'];
 
 export const DashboardArticles = ({
@@ -55,7 +62,10 @@ export const DashboardArticles = ({
 								title='Klicka för att uppgradera din prenumeration'
 							>
 								<div>
-									<strong className='text-blue-400'>{article.title}</strong>
+									<strong className='text-blue-400'>{article.title} </strong>
+									<strong className='text-black-400'>
+										({levelNames[article.levelRequired]})
+									</strong>
 									<span className='ml-2 text-sm text-gray-700'>(Lås upp)</span>
 								</div>
 							</li>
