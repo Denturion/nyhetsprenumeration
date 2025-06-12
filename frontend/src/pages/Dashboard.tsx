@@ -135,7 +135,7 @@ export const Dashboard = () => {
                   ? new Date(user.subscriptionExpiresAt).toLocaleDateString(
                       "sv-SE"
                     )
-                  : "Din premunation har gått ut"}
+                  : "Ingen aktiv prenumeration"}
               </p>
               {!subCanceld ? (
                 <button
