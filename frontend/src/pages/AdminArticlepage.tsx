@@ -85,6 +85,10 @@ export const AdminArticlepage = () => {
     }
   };
 
+  const filteredArticles = selectedLevel
+  ? articles.filter(article => article.levelRequired === selectedLevel)
+  : articles;
+
   return (
     <div className="bg-gray-900 text-gray-100 px-4 py-6 w-full max-w-7xl mx-auto">
 
@@ -183,7 +187,7 @@ export const AdminArticlepage = () => {
             <p className="text-red-400">Kunde inte hitta några artiklar</p>
           ) : (
             <ArticleList
-              articles={articles}
+              articles={filteredArticles}
               onUpdate={handelUpdate}
               onDelete={DeleteArticle}
             />
